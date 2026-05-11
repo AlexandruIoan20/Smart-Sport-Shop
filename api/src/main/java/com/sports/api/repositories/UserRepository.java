@@ -1,6 +1,7 @@
 package com.sports.api.repositories;
 
 import com.sports.api.dto.RegisterRequestDTO;
+import com.sports.api.dto.UserLoginDataDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,19 @@ public class UserRepository {
                 request.lastName(),
                 request.birthDate()
         );
+    }
+
+    public UserLoginDataDTO getUserForLogin(String email) {
+        String statement = "SELECT * FROM get_user_for_login(?::varchar)";
+
+        return jdbcTemplate.query(statement, rs -> {
+            if (rs.next()) {
+                return new UserLoginDataDTO(
+                        (UUID) rs.getObject("id"),
+                        rs.getString("password_hash")
+                );
+            }
+            return null;
+        }, email);
     }
 }

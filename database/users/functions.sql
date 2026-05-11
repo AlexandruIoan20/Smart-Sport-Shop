@@ -33,7 +33,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_user_for_login(p_email VARCHAR)
 RETURNS TABLE (
     id UUID,
-    password_hash VARCHAR,
+    password_hash VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
