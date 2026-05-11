@@ -1,11 +1,13 @@
 package com.sports.api.controllers;
 
 import com.sports.api.dto.ProfileRequestDTO;
+import com.sports.api.dto.ProfileResponseDTO;
 import com.sports.api.services.ProfileService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -19,6 +21,12 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
+    @GetMapping
+    public ResponseEntity<?> getProfile(@RequestHeader("X-User-Id") UUID userId) {
+        ProfileResponseDTO profile = profileService.getUserProfile(userId);
+        return ResponseEntity.ok(Objects.requireNonNullElseGet(profile, () -> Map.of("exists", false)));
+    }
+
     @PostMapping("/complete")
     public ResponseEntity<?> completeProfile(
             @RequestHeader("X-User-Id") UUID userId,
@@ -26,8 +34,11 @@ public class ProfileController {
         try {
             profileService.completeUserProfile(userId, request);
             return ResponseEntity.ok(Map.of("message", "Profil finalizat cu succes!"));
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Eroare internă: " + e.getMessage()));
         }
     }
 }

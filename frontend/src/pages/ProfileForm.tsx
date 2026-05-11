@@ -1,105 +1,244 @@
-import { useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import {
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
+} from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  GOAL_OPTIONS, ENVIRONMENT_OPTIONS,
+  DAILY_SCHEDULE_OPTIONS, ACTIVITY_LEVEL_OPTIONS,
+} from "@/constants/enums"
 
-const profileSchema = z.object({
-  occupation: z.string().min(2, "Ocupația este obligatorie"),
-  goal: z.enum(["weight_loss", "muscle_gain", "cardio", "stress_relief", "flexibility"]),
-  preferredEnvironment: z.enum(["indoor", "outdoor", "both"]),
-  dailySchedule: z.enum(["morning", "afternoon", "night"]),
-  freeHoursWeek: z.number().min(1).max(168),
-  activityLevel: z.enum(["sedentary", "beginner", "intermediate", "advanced"]),
-  budgetMin: z.number().min(0),
-  budgetMax: z.number().min(0),
+const formSchema = z.object({
+  occupation:           z.string().optional(),
+  goal:                 z.enum(["WEIGHT_LOSS", "MUSCLE_GAIN", "CARDIO", "STRESS_RELIEF", "FLEXIBILITY"] as const),
+  preferredEnvironment: z.enum(["INDOOR", "OUTDOOR", "BOTH"] as const),
+  dailySchedule:        z.enum(["FULL_TIME", "PART_TIME", "FLEXIBLE", "STUDENT", "RETIRED"] as const),
+  freeHoursWeek:        z.coerce.number().min(0).max(168),
+  activityLevel:        z.enum(["SEDENTARY", "LIGHT", "MODERATE", "ACTIVE", "VERY_ACTIVE"] as const),
+  budgetMin:            z.coerce.number().min(0),
+  budgetMax:            z.coerce.number().min(0),
+}).refine(d => d.budgetMax >= d.budgetMin, {
+  message: "Bugetul maxim trebuie să fie mai mare decât minimul",
+  path: ["budgetMax"],
 })
 
-export default function ProfileForm() {
-  const navigate = useNavigate()
-  const [step, setStep] = useState(1)
+type FormValues = z.infer<typeof formSchema>
 
-  const form = useForm<z.infer<typeof profileSchema>>({
-    resolver: zodResolver(profileSchema),
+const USER_ID = localStorage.getItem("userId") ?? ""
+const inputCls = "bg-zinc-950 border-zinc-800 text-zinc-100"
+const selectContentCls = "bg-zinc-900 border-zinc-700 text-zinc-100"
+
+function SelectField({
+  name, label, options, control,
+}: {
+  name: keyof FormValues
+  label: string
+  options: readonly { value: string; label: string }[]
+  control: any
+}) {
+  return (
+    <FormField control={control} name={name} render={({ field }) => (
+      <FormItem>
+        <FormLabel>{label}</FormLabel>
+        <Select onValueChange={field.onChange} value={field.value as string}>
+          <FormControl>
+            <SelectTrigger className={inputCls}>
+              <SelectValue placeholder={`Alege ${label.toLowerCase()}`} />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent className={selectContentCls}>
+            {options.map(opt => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FormMessage className="text-red-400" />
+      </FormItem>
+    )} />
+  )
+}
+
+export default function ProfileForm() {
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      occupation: "",
-      goal: "weight_loss",
-      preferredEnvironment: "indoor",
-      dailySchedule: "morning",
-      freeHoursWeek: 5,
-      activityLevel: "sedentary", // camelCase corect
-      budgetMin: 0,
-      budgetMax: 500,
+      occupation:           "",
+      goal:                 "CARDIO",
+      preferredEnvironment: "BOTH",
+      dailySchedule:        "FULL_TIME",
+      freeHoursWeek:        5,
+      activityLevel:        "MODERATE",
+      budgetMin:            0,
+      budgetMax:            500,
     },
   })
 
-  async function onSubmit(values: z.infer<typeof profileSchema>) {
-    const userId = localStorage.getItem("userId")
-    if (!userId) { navigate("/login"); return; }
+  useEffect(() => {
+    if (!USER_ID) return
 
+    async function fetchProfile() {
+      try {
+        const res = await fetch("http://localhost:8081/api/profiles", {
+          headers: { "X-User-Id": USER_ID },
+        })
+        const data = await res.json()
+
+        if (res.ok && data.exists !== false) {
+          form.reset({
+            occupation:           data.occupation           ?? "",
+            goal:                 data.goal                 ?? "CARDIO",
+            preferredEnvironment: data.preferredEnvironment ?? "BOTH",
+            dailySchedule:        data.dailySchedule        ?? "FULL_TIME",
+            freeHoursWeek:        data.freeHoursWeek        ?? 5,
+            activityLevel:        data.activityLevel        ?? "MODERATE",
+            budgetMin:            data.budgetMin             ?? 0,
+            budgetMax:            data.budgetMax             ?? 500,
+          })
+        }
+      } catch (err) {
+        console.error("Nu s-a putut încărca profilul:", err)
+      }
+    }
+
+    fetchProfile()
+  }, [form])
+
+  async function onSubmit(values: FormValues) {
     try {
-      const response = await fetch("http://localhost:8081/api/profiles/complete", {
+      const res = await fetch("http://localhost:8081/api/profiles/complete", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "X-User-Id": userId },
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id": USER_ID,
+        },
         body: JSON.stringify(values),
       })
 
-      if (response.ok) {
-        alert("Profil salvat!")
-        navigate("/dashboard")
+      const data = await res.json()
+
+      if (!res.ok) {
+        if (data.error?.includes("BUDGET_INVALID")) {
+          form.setError("budgetMax", {
+            type: "manual",
+            message: "Bugetul maxim trebuie să fie mai mare decât minimul",
+          })
+        } else {
+          alert("Eroare: " + data.error)
+        }
+        return
       }
-    } catch (error) { console.error(error); }
+
+      alert("Profil salvat cu succes!")
+    } catch (err) {
+      console.error(err)
+      alert("Nu ne-am putut conecta la server.")
+    }
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl bg-zinc-900 border-zinc-800 text-zinc-100 shadow-xl">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-blue-500">Finalizare Profil</CardTitle>
-          <CardDescription>Pasul {step} din 3</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {step === 1 && (
-                <div className="space-y-4">
-                  <FormField control={form.control} name="occupation" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Ocupație</FormLabel>
-                      <FormControl><Input className="bg-zinc-950" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="activityLevel" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nivel activitate</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger className="bg-zinc-950"><SelectValue /></SelectTrigger></FormControl>
-                        <SelectContent className="bg-zinc-900 text-white">
-                          <SelectItem value="sedentary">Sedentar</SelectItem>
-                          <SelectItem value="beginner">Începător</SelectItem>
-                          <SelectItem value="intermediate">Intermediar</SelectItem>
-                          <SelectItem value="advanced">Avansat</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )} />
-                  <Button type="button" onClick={() => setStep(2)}>Înainte</Button>
-                </div>
-              )}
-              {/* Adaugă analog pașii 2 și 3 asigurându-te că 'name' corespunde camelCase-ului din schemă */}
-              {step === 3 && (
-                <Button type="submit">Finalizează</Button>
-              )}
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+    <Card className="w-full max-w-2xl mx-auto bg-zinc-900 border-zinc-800 text-zinc-100 shadow-2xl">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Profilul tău sportiv</CardTitle>
+        <CardDescription className="text-zinc-400">
+          Completează informațiile pentru recomandări personalizate.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+
+            <FormField control={form.control} name="occupation" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ocupație</FormLabel>
+                <FormControl>
+                  <Input placeholder="ex: Inginer, Student..." className={inputCls} {...field} />
+                </FormControl>
+                <FormMessage className="text-red-400" />
+              </FormItem>
+            )} />
+
+            <div className="grid grid-cols-2 gap-4">
+              <SelectField
+                name="goal"
+                label="Obiectiv principal"
+                options={GOAL_OPTIONS}
+                control={form.control}
+              />
+              <SelectField
+                name="preferredEnvironment"
+                label="Mediu preferat"
+                options={ENVIRONMENT_OPTIONS}
+                control={form.control}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <SelectField
+                name="dailySchedule"
+                label="Program zilnic"
+                options={DAILY_SCHEDULE_OPTIONS}
+                control={form.control}
+              />
+              <SelectField
+                name="activityLevel"
+                label="Nivel de activitate"
+                options={ACTIVITY_LEVEL_OPTIONS}
+                control={form.control}
+              />
+            </div>
+
+            <FormField control={form.control} name="freeHoursWeek" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Ore libere pe săptămână</FormLabel>
+                <FormControl>
+                  <Input type="number" min={0} max={168} className={inputCls} {...field} />
+                </FormControl>
+                <FormMessage className="text-red-400" />
+              </FormItem>
+            )} />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField control={form.control} name="budgetMin" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Buget minim (RON)</FormLabel>
+                  <FormControl>
+                    <Input type="number" min={0} className={inputCls} {...field} />
+                  </FormControl>
+                  <FormMessage className="text-red-400" />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="budgetMax" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Buget maxim (RON)</FormLabel>
+                  <FormControl>
+                    <Input type="number" min={0} className={inputCls} {...field} />
+                  </FormControl>
+                  <FormMessage className="text-red-400" />
+                </FormItem>
+              )} />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-6"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Se salvează..." : "Salvează profilul"}
+            </Button>
+
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   )
 }

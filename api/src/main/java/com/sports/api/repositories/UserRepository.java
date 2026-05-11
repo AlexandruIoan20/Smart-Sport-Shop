@@ -1,6 +1,7 @@
 package com.sports.api.repositories;
 
 import com.sports.api.dto.ProfileRequestDTO;
+import com.sports.api.dto.ProfileResponseDTO;
 import com.sports.api.dto.RegisterRequestDTO;
 import com.sports.api.dto.UserLoginDataDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -60,4 +61,25 @@ public class UserRepository {
                 dto.budgetMax()
         );
     }
+
+    public ProfileResponseDTO getUserProfile(UUID userId) {
+        String sql = "SELECT * FROM get_user_profile(?::uuid)";
+
+        return jdbcTemplate.query(sql, rs -> {
+            if (rs.next()) {
+                return new ProfileResponseDTO(
+                        rs.getString("occupation"),
+                        rs.getString("goal"),
+                        rs.getString("preferred_environment"),
+                        rs.getString("daily_schedule"),
+                        rs.getObject("free_hours_week", Integer.class),
+                        rs.getString("activity_level"),
+                        rs.getBigDecimal("budget_min"),
+                        rs.getBigDecimal("budget_max")
+                );
+            }
+            return null;
+        }, userId);
+    }
 }
+

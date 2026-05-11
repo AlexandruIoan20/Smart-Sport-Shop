@@ -40,3 +40,35 @@ BEGIN
     SELECT u.id, u.password_hash FROM users u WHERE u.email = p_email;
 END;
 $$ LANGUAGE plpgsql; 
+
+
+CREATE OR REPLACE FUNCTION get_user_profile(p_user_id UUID)
+RETURNS TABLE (
+    occupation            VARCHAR,
+    goal                  goal_type,
+    preferred_environment environment_type,
+    daily_schedule        daily_schedule_type,
+    free_hours_week       INT,
+    activity_level        activity_level_type,
+    budget_min            NUMERIC,
+    budget_max            NUMERIC,
+    updated_at            TIMESTAMP
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        up.occupation,
+        up.goal,
+        up.preferred_environment,
+        up.daily_schedule,
+        up.free_hours_week,
+        up.activity_level,
+        up.budget_min,
+        up.budget_max,
+        up.updated_at
+    FROM user_profiles up
+    WHERE up.user_id = p_user_id;
+END;
+$$;
