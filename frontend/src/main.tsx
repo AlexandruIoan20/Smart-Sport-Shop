@@ -6,6 +6,7 @@ import Register from './pages/Register.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'; 
 import Login from './pages/Login.tsx';
 import ProfileForm from './pages/ProfileForm.tsx';
+import QuestionnairePage from './pages/QuestionnairePage.tsx';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   { 
     path: "/profile",
     element: <ProfileForm />,
+  }, 
+  { 
+    path: "/questionnaire",
+    element: <QuestionnairePage />,
   }
 ])
 

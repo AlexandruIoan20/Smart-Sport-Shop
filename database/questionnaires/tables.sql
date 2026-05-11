@@ -11,7 +11,7 @@ CREATE TABLE questionnaires (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     completed_at TIMESTAMP NOT NULL DEFAULT now(),
     status questionnaire_status_type NOT NULL DEFAULT 'COMPLETED',
-    computed_level VARCHAR(20)
+    computed_level current_level_type
 );
 
 CREATE TABLE questionnaire_answers (
@@ -27,7 +27,7 @@ CREATE TABLE recommendation_sessions (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     questionnaire_id UUID NOT NULL REFERENCES questionnaires(id),
     created_at TIMESTAMP NOT NULL DEFAULT now(),
-    user_level_at_time VARCHAR(20) NOT NULL
+    user_level_at_time current_level_type NOT NULL
 );
 
 CREATE TABLE recommendation_sports (
