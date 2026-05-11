@@ -14,6 +14,20 @@ CREATE TYPE activity_level_type AS ENUM (
     'VERY_ACTIVE'
 );
 
+CREATE TYPE goal_type AS ENUM (
+    'WEIGHT_LOSS', 
+    'MUSCLE_GAIN', 
+    'CARDIO', 
+    'STRESS_RELIEF', 
+    'FLEXIBILITY'
+);
+
+CREATE TYPE environment_type AS ENUM (
+    'INDOOR', 
+    'OUTDOOR', 
+    'BOTH'
+);
+
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -30,6 +44,8 @@ CREATE TABLE user_profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     occupation VARCHAR(100),
+    goal goal_type,
+    preferred_environment environment_type,
     daily_schedule daily_schedule_type,
     free_hours_week INT,
     activity_level activity_level_type,

@@ -1,5 +1,6 @@
 package com.sports.api.repositories;
 
+import com.sports.api.dto.ProfileRequestDTO;
 import com.sports.api.dto.RegisterRequestDTO;
 import com.sports.api.dto.UserLoginDataDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,5 +43,21 @@ public class UserRepository {
             }
             return null;
         }, email);
+    }
+
+    public void completeProfile(UUID userId, ProfileRequestDTO dto) {
+        String sql = "CALL complete_user_profile(?, ?, ?::goal_type, ?::environment_type, ?::daily_schedule_type, ?, ?::activity_level_type, ?, ?)";
+
+        jdbcTemplate.update(sql,
+                userId,
+                dto.occupation(),
+                dto.goal(),
+                dto.preferredEnvironment(),
+                dto.dailySchedule(),
+                dto.freeHoursWeek(),
+                dto.activityLevel(),
+                dto.budgetMin(),
+                dto.budgetMax()
+        );
     }
 }
