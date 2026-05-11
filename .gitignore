@@ -1,0 +1,10 @@
+.env
+pgdata/
+
+Thumbs.db
+Desktop.ini
+
+.idea/
+.vscode/
+*.swp
+*.swo
