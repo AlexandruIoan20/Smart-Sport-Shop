@@ -7,13 +7,14 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-  GOAL_OPTIONS, ENVIRONMENT_OPTIONS,
-  DAILY_SCHEDULE_OPTIONS, ACTIVITY_LEVEL_OPTIONS,
+  GOAL_OPTIONS, ENVIRONMENT_OPTIONS, DAILY_SCHEDULE_OPTIONS,
+  ACTIVITY_LEVEL_OPTIONS, EFFORT_TOLERANCE_OPTIONS, PREFERS_TEAM_OPTIONS,
 } from "@/constants/enums"
 
 const formSchema = z.object({
@@ -23,6 +24,9 @@ const formSchema = z.object({
   dailySchedule:        z.enum(["FULL_TIME", "PART_TIME", "FLEXIBLE", "STUDENT", "RETIRED"] as const),
   freeHoursWeek:        z.coerce.number().min(0).max(168),
   activityLevel:        z.enum(["SEDENTARY", "LIGHT", "MODERATE", "ACTIVE", "VERY_ACTIVE"] as const),
+  effortTolerance:      z.enum(["LOW", "MEDIUM", "HIGH"] as const),
+  prefersTeam:          z.enum(["true", "false"] as const),
+  medicalNotes:         z.string().optional(),
   budgetMin:            z.coerce.number().min(0),
   budgetMax:            z.coerce.number().min(0),
 }).refine(d => d.budgetMax >= d.budgetMin, {
@@ -32,15 +36,15 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-const USER_ID = localStorage.getItem("userId") ?? ""
-const inputCls = "bg-zinc-950 border-zinc-800 text-zinc-100"
-const selectContentCls = "bg-zinc-900 border-zinc-700 text-zinc-100"
+const USER_ID       = localStorage.getItem("userId") ?? ""
+const inputCls      = "bg-zinc-950 border-zinc-800 text-zinc-100"
+const selectCls     = "bg-zinc-900 border-zinc-700 text-zinc-100"
 
 function SelectField({
   name, label, options, control,
 }: {
-  name: keyof FormValues
-  label: string
+  name:    keyof FormValues
+  label:   string
   options: readonly { value: string; label: string }[]
   control: any
 }) {
@@ -54,7 +58,7 @@ function SelectField({
               <SelectValue placeholder={`Alege ${label.toLowerCase()}`} />
             </SelectTrigger>
           </FormControl>
-          <SelectContent className={selectContentCls}>
+          <SelectContent className={selectCls}>
             {options.map(opt => (
               <SelectItem key={opt.value} value={opt.value}>
                 {opt.label}
@@ -78,6 +82,9 @@ export default function ProfileForm() {
       dailySchedule:        "FULL_TIME",
       freeHoursWeek:        5,
       activityLevel:        "MODERATE",
+      effortTolerance:      "MEDIUM",
+      prefersTeam:          "false",
+      medicalNotes:         "",
       budgetMin:            0,
       budgetMax:            500,
     },
@@ -88,7 +95,7 @@ export default function ProfileForm() {
 
     async function fetchProfile() {
       try {
-        const res = await fetch("http://localhost:8081/api/profiles", {
+        const res  = await fetch("http://localhost:8081/api/profiles", {
           headers: { "X-User-Id": USER_ID },
         })
         const data = await res.json()
@@ -101,6 +108,11 @@ export default function ProfileForm() {
             dailySchedule:        data.dailySchedule        ?? "FULL_TIME",
             freeHoursWeek:        data.freeHoursWeek        ?? 5,
             activityLevel:        data.activityLevel        ?? "MODERATE",
+            effortTolerance:      data.effortTolerance      ?? "MEDIUM",
+            prefersTeam:          data.prefersTeam !== null
+                                    ? String(data.prefersTeam) as "true" | "false"
+                                    : "false",
+            medicalNotes:         data.medicalNotes         ?? "",
             budgetMin:            data.budgetMin             ?? 0,
             budgetMax:            data.budgetMax             ?? 500,
           })
@@ -119,9 +131,12 @@ export default function ProfileForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Id": USER_ID,
+          "X-User-Id":    USER_ID,
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          prefersTeam: values.prefersTeam === "true",
+        }),
       })
 
       const data = await res.json()
@@ -129,7 +144,7 @@ export default function ProfileForm() {
       if (!res.ok) {
         if (data.error?.includes("BUDGET_INVALID")) {
           form.setError("budgetMax", {
-            type: "manual",
+            type:    "manual",
             message: "Bugetul maxim trebuie să fie mai mare decât minimul",
           })
         } else {
@@ -197,6 +212,21 @@ export default function ProfileForm() {
               />
             </div>
 
+            <div className="grid grid-cols-2 gap-4">
+              <SelectField
+                name="effortTolerance"
+                label="Toleranță la efort"
+                options={EFFORT_TOLERANCE_OPTIONS}
+                control={form.control}
+              />
+              <SelectField
+                name="prefersTeam"
+                label="Tip sport preferat"
+                options={PREFERS_TEAM_OPTIONS}
+                control={form.control}
+              />
+            </div>
+
             <FormField control={form.control} name="freeHoursWeek" render={({ field }) => (
               <FormItem>
                 <FormLabel>Ore libere pe săptămână</FormLabel>
@@ -227,6 +257,21 @@ export default function ProfileForm() {
                 </FormItem>
               )} />
             </div>
+
+            <FormField control={form.control} name="medicalNotes" render={({ field }) => (
+              <FormItem>
+                <FormLabel>Restricții medicale / Note</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="ex: probleme cu genunchiul, hernie de disc..."
+                    className={`${inputCls} resize-none`}
+                    rows={3}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-red-400" />
+              </FormItem>
+            )} />
 
             <Button
               type="submit"

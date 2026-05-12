@@ -9,6 +9,9 @@ public record ProfileRequestDTO(
         String dailySchedule,
         Integer freeHoursWeek,
         String activityLevel,
-        BigDecimal budgetMin,
-        BigDecimal budgetMax
+        String effortTolerance,
+        Boolean prefersTeam,
+        String medicalNotes,
+        Double budgetMin,
+        Double budgetMax
 ) {}

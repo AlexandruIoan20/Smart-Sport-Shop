@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION register_user(
-    p_username VARCHAR,
-    p_email VARCHAR,
+    p_username      VARCHAR,
+    p_email         VARCHAR,
     p_password_hash VARCHAR,
-    p_first_name VARCHAR,
-    p_last_name VARCHAR,
-    p_birth_date DATE
+    p_first_name    VARCHAR,
+    p_last_name     VARCHAR,
+    p_birth_date    DATE
 ) RETURNS UUID AS $$
 DECLARE
     v_new_user_id UUID;
@@ -30,16 +30,17 @@ EXCEPTION
 END;
 $$ LANGUAGE plpgsql;
 
+
 CREATE OR REPLACE FUNCTION get_user_for_login(p_email VARCHAR)
 RETURNS TABLE (
-    id UUID,
+    id            UUID,
     password_hash VARCHAR
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT u.id, u.password_hash FROM users u WHERE u.email = p_email;
 END;
-$$ LANGUAGE plpgsql; 
+$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION get_user_profile(p_user_id UUID)
@@ -50,12 +51,13 @@ RETURNS TABLE (
     daily_schedule        daily_schedule_type,
     free_hours_week       INT,
     activity_level        activity_level_type,
+    effort_tolerance      effort_tolerance_type,
+    prefers_team          BOOLEAN,
+    medical_notes         TEXT,
     budget_min            NUMERIC,
     budget_max            NUMERIC,
     updated_at            TIMESTAMP
-)
-LANGUAGE plpgsql
-AS $$
+) AS $$
 BEGIN
     RETURN QUERY
     SELECT
@@ -65,10 +67,13 @@ BEGIN
         up.daily_schedule,
         up.free_hours_week,
         up.activity_level,
+        up.effort_tolerance,
+        up.prefers_team,
+        up.medical_notes,
         up.budget_min,
         up.budget_max,
         up.updated_at
     FROM user_profiles up
     WHERE up.user_id = p_user_id;
 END;
-$$;
+$$ LANGUAGE plpgsql;

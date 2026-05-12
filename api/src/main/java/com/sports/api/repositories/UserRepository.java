@@ -18,10 +18,10 @@ public class UserRepository {
     }
 
     public UUID callRegisterUserFunction(RegisterRequestDTO request, String hashedPassword) {
-        String statement = "SELECT register_user(?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::date)";
+        String sql = "SELECT register_user(?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::varchar, ?::date)";
 
         return jdbcTemplate.queryForObject(
-                statement,
+                sql,
                 UUID.class,
                 request.username(),
                 request.email(),
@@ -33,9 +33,9 @@ public class UserRepository {
     }
 
     public UserLoginDataDTO getUserForLogin(String email) {
-        String statement = "SELECT * FROM get_user_for_login(?::varchar)";
+        String sql = "SELECT * FROM get_user_for_login(?::varchar)";
 
-        return jdbcTemplate.query(statement, rs -> {
+        return jdbcTemplate.query(sql, rs -> {
             if (rs.next()) {
                 return new UserLoginDataDTO(
                         (UUID) rs.getObject("id"),
@@ -47,7 +47,13 @@ public class UserRepository {
     }
 
     public void completeProfile(UUID userId, ProfileRequestDTO dto) {
-        String sql = "CALL complete_user_profile(?, ?, ?::goal_type, ?::environment_type, ?::daily_schedule_type, ?, ?::activity_level_type, ?, ?)";
+        String sql = """
+                CALL complete_user_profile(
+                    ?::uuid, ?, ?::goal_type, ?::environment_type,
+                    ?::daily_schedule_type, ?, ?::activity_level_type,
+                    ?::effort_tolerance_type, ?, ?, ?, ?
+                )
+                """;
 
         jdbcTemplate.update(sql,
                 userId,
@@ -57,6 +63,9 @@ public class UserRepository {
                 dto.dailySchedule(),
                 dto.freeHoursWeek(),
                 dto.activityLevel(),
+                dto.effortTolerance(),
+                dto.prefersTeam(),
+                dto.medicalNotes(),
                 dto.budgetMin(),
                 dto.budgetMax()
         );
@@ -74,12 +83,14 @@ public class UserRepository {
                         rs.getString("daily_schedule"),
                         rs.getObject("free_hours_week", Integer.class),
                         rs.getString("activity_level"),
-                        rs.getBigDecimal("budget_min"),
-                        rs.getBigDecimal("budget_max")
+                        rs.getString("effort_tolerance"),
+                        rs.getBoolean("prefers_team"),
+                        rs.getString("medical_notes"),
+                        rs.getDouble("budget_min"),
+                        rs.getDouble("budget_max")
                 );
             }
             return null;
         }, userId);
     }
 }
-
