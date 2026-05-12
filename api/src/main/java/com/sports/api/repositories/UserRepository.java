@@ -83,9 +83,9 @@ public class UserRepository {
     }
 
     public ProfileResponseDTO getUserProfile(UUID userId) {
-        String sql = "SELECT * FROM get_user_profile(?::uuid)";
+        String statement = "SELECT * FROM get_user_profile(?::uuid)";
 
-        return jdbcTemplate.query(sql, rs -> {
+        return jdbcTemplate.query(statement, rs -> {
             if (rs.next()) {
                 return new ProfileResponseDTO(
                         rs.getString("occupation"),

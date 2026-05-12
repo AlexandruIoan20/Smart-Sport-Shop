@@ -3,8 +3,13 @@
 \i /docker-entrypoint-initdb.d/products/tables.sql
 \i /docker-entrypoint-initdb.d/questionnaires/tables.sql
 \i /docker-entrypoint-initdb.d/orders/tables.sql
+
 \i /docker-entrypoint-initdb.d/users/functions.sql
+\i /docker-entrypoint-initdb.d/products/functions.sql
 \i /docker-entrypoint-initdb.d/questionnaires/functions.sql
+
 \i /docker-entrypoint-initdb.d/questionnaires/procedures.sql
+
 \i /docker-entrypoint-initdb.d/seed/sports_seed.sql
 \i /docker-entrypoint-initdb.d/seed/sports_criteria_seed.sql
+\i /docker-entrypoint-initdb.d/seed/products_seed.sql

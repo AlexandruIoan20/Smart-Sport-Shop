@@ -6,8 +6,7 @@ import Register from './pages/Register.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'; 
 import Login from './pages/Login.tsx';
 import ProfileForm from './pages/ProfileForm.tsx';
-import QuestionnairePage from './pages/QuestionnairePage.tsx';
-
+import DashboardPage from './pages/Dashboard/DashboardPage.tsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -25,14 +24,15 @@ const router = createBrowserRouter([
     path: "/profile",
     element: <ProfileForm />,
   }, 
-  { 
-    path: "/questionnaire",
-    element: <QuestionnairePage />,
+  {
+    path: "/dashboard",
+    element: <DashboardPage />,
   }
 ])
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
+    
   </StrictMode>,
 )
