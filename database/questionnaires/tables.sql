@@ -1,31 +1,7 @@
-CREATE TYPE questionnaire_status_type AS ENUM (
-    'IN_PROGRESS',
-    'COMPLETED',
-    'ABANDONED',
-    'EXPIRED',
-    'RECOMPUTED'
-);
-
-CREATE TABLE questionnaires (
+CREATE TABLE recommendation_sessions (  
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    completed_at TIMESTAMP NOT NULL DEFAULT now(),
-    status questionnaire_status_type NOT NULL DEFAULT 'COMPLETED',
-    computed_level current_level_type
-);
-
-CREATE TABLE questionnaire_answers (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    questionnaire_id UUID NOT NULL REFERENCES questionnaires(id) ON DELETE CASCADE,
-    question_key VARCHAR(100) NOT NULL,
-    answer_value VARCHAR(255) NOT NULL,
-    UNIQUE (questionnaire_id, question_key)
-);
-
-CREATE TABLE recommendation_sessions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    questionnaire_id UUID NOT NULL REFERENCES questionnaires(id),
+    profile_id UUID NOT NULL REFERENCES user_profiles(id),
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     user_level_at_time current_level_type NOT NULL
 );

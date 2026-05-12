@@ -46,16 +46,27 @@ public class UserRepository {
         }, email);
     }
 
-    public void completeProfile(UUID userId, ProfileRequestDTO dto) {
+    public UUID completeProfile(UUID userId, ProfileRequestDTO dto) {
         String sql = """
-                CALL complete_user_profile(
-                    ?::uuid, ?, ?::goal_type, ?::environment_type,
-                    ?::daily_schedule_type, ?, ?::activity_level_type,
-                    ?::effort_tolerance_type, ?, ?, ?, ?
-                )
-                """;
+            SELECT complete_user_profile(
+                ?::uuid,
+                ?::varchar,
+                ?::goal_type,
+                ?::environment_type,
+                ?::daily_schedule_type,
+                ?::integer,
+                ?::activity_level_type,
+                ?::effort_tolerance_type,
+                ?::boolean,
+                ?::text,
+                ?::numeric,
+                ?::numeric
+            )
+            """;
 
-        jdbcTemplate.update(sql,
+        return jdbcTemplate.queryForObject(
+                sql,
+                UUID.class,
                 userId,
                 dto.occupation(),
                 dto.goal(),
@@ -92,5 +103,11 @@ public class UserRepository {
             }
             return null;
         }, userId);
+    }
+
+    public UUID generateRecommendations(UUID profileId) {
+        String statement = "SELECT generate_recommendations(?::uuid)";
+
+        return jdbcTemplate.queryForObject(statement, UUID.class, profileId);
     }
 }

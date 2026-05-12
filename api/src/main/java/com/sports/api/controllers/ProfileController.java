@@ -14,7 +14,6 @@ import java.util.UUID;
 @RequestMapping("/api/profiles")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ProfileController {
-
     private final ProfileService profileService;
 
     public ProfileController(ProfileService profileService) {
@@ -24,7 +23,9 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<?> getProfile(@RequestHeader("X-User-Id") UUID userId) {
         ProfileResponseDTO profile = profileService.getUserProfile(userId);
+
         return ResponseEntity.ok(Objects.requireNonNullElseGet(profile, () -> Map.of("exists", false)));
+
     }
 
     @PostMapping("/complete")
@@ -32,13 +33,17 @@ public class ProfileController {
             @RequestHeader("X-User-Id") UUID userId,
             @RequestBody ProfileRequestDTO request) {
         try {
-            profileService.completeUserProfile(userId, request);
-            return ResponseEntity.ok(Map.of("message", "Profil finalizat cu succes!"));
+            UUID sessionId = profileService.completeUserProfile(userId, request);
+            return ResponseEntity.ok(Map.of(
+                    "message",   "Profil salvat cu succes!",
+                    "sessionId", sessionId
+            ));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", "Eroare internă: " + e.getMessage()));
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 }
