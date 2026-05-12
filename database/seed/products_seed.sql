@@ -4,9 +4,6 @@ INSERT INTO categories (id, name, description) VALUES
     ('c1000000-0000-0000-0000-000000000003', 'Equipment', 'Echipamente hardware, mingi, rachete și accesorii grele.'),
     ('c1000000-0000-0000-0000-000000000004', 'Accessories', 'Accesorii mici, genți, sticle de apă, ceasuri sport.');
 
--- ============================================================================
--- 2. POPULARE PRODUSE (90 de produse cu imagini dinamice de pe internet)
--- ============================================================================
 INSERT INTO products (id, name, description, price, category_id, sport_id, target_level, brand, image_url) VALUES
 
     -- RUNNING (a...01)

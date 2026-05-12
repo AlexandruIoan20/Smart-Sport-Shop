@@ -6,6 +6,7 @@
 
 \i /docker-entrypoint-initdb.d/users/functions.sql
 \i /docker-entrypoint-initdb.d/products/functions.sql
+\i /docker-entrypoint-initdb.d/sports/functions.sql
 \i /docker-entrypoint-initdb.d/questionnaires/functions.sql
 
 \i /docker-entrypoint-initdb.d/questionnaires/procedures.sql

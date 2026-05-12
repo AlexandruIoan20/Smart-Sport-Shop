@@ -18,3 +18,15 @@ export interface Product {
   stockQuantity: number;
   createdAt: string;
 }
+
+export interface Sport {
+  sportId: string;
+  name: string;
+  description: string;
+  teamSport: boolean;
+  outdoor: boolean;
+  effortLevel: number;
+  minBudget: number;
+  imageUrl: string | null;
+  active: boolean;
+}
