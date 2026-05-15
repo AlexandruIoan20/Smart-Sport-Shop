@@ -5,6 +5,7 @@ import com.sports.api.repositories.SportRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SportService {
@@ -16,5 +17,9 @@ public class SportService {
 
     public List<SportResponseDTO> getAllSports() {
         return sportRepository.getAllSports();
+    }
+
+    public SportResponseDTO getSportById(UUID sportId) {
+        return sportRepository.getSportById(sportId);
     }
 }

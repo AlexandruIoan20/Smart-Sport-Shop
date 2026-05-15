@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/sports")
@@ -22,5 +23,11 @@ public class SportController {
     public ResponseEntity<List<SportResponseDTO>> getAllSports() {
         List<SportResponseDTO> sports = sportService.getAllSports();
         return ResponseEntity.ok(sports);
+    }
+
+    @GetMapping("/{sportId}")
+    public ResponseEntity<SportResponseDTO> getSportById(@PathVariable UUID sportId) {
+        SportResponseDTO sport = sportService.getSportById(sportId);
+        return ResponseEntity.ok(sport);
     }
 }

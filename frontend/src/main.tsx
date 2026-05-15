@@ -15,6 +15,7 @@ import DashboardPage from './pages/Dashboard/DashboardPage.tsx'
 import ProductPage from './pages/ProductPage.tsx'
 import MainLayout from './components/MainLayout.tsx'
 import SportPage from './pages/Sport/SportPage.tsx'
+import SportProductsPage from './pages/SportsProductPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
         path: "/sports",
         element: <SportPage />,
       },
+      {
+        path: "/sports/:sportId/products", 
+        element: <SportProductsPage />, 
+      }
     ],
   },
 
