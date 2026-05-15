@@ -41,6 +41,7 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     first_name    VARCHAR(100) NOT NULL,
     last_name     VARCHAR(100) NOT NULL,
+    address       TEXT, 
     birth_date    DATE         NOT NULL,
     phone         VARCHAR(20),
     created_at    TIMESTAMP    NOT NULL DEFAULT now()

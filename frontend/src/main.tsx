@@ -10,7 +10,6 @@ import {
 import App from './App.tsx'
 import Register from './pages/Register.tsx'
 import Login from './pages/Login.tsx'
-import ProfileForm from './pages/ProfileForm.tsx'
 import DashboardPage from './pages/Dashboard/DashboardPage.tsx'
 import ProductPage from './pages/ProductPage.tsx'
 import MainLayout from './components/MainLayout.tsx'
@@ -18,6 +17,7 @@ import SportPage from './pages/SportPage.tsx'
 import SportProductsPage from './pages/SportsProductPage.tsx'
 import RecommendationsPage from './pages/RecommendationsPage/RecommendationsPage.tsx'
 import OrderPage from './pages/OrderPage.tsx'
+import ProfilePage from './pages/ProfilePage/ProfilePage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
 
       {
         path: "/profile",
-        element: <ProfileForm />,
+        element: <ProfilePage />,
       },
       {
         path: "/products/:productId",

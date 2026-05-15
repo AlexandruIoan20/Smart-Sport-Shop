@@ -156,3 +156,29 @@ BEGIN
     RETURN v_profile_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION update_user_personal_data(
+    p_user_id    UUID,
+    p_first_name VARCHAR,
+    p_last_name  VARCHAR,
+    p_phone      VARCHAR,
+    p_address    TEXT
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE users
+    SET    first_name = p_first_name,
+           last_name  = p_last_name,
+           phone      = p_phone,
+           address    = p_address
+    WHERE  id = p_user_id;
+
+    IF NOT FOUND THEN
+        RETURN FALSE;
+    END IF;
+
+    RETURN TRUE;
+END;
+$$;

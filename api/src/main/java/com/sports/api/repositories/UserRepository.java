@@ -1,8 +1,10 @@
 package com.sports.api.repositories;
 
+import com.sports.api.dto.PersonalDataResponseDTO;
 import com.sports.api.dto.ProfileRequestDTO;
 import com.sports.api.dto.ProfileResponseDTO;
 import com.sports.api.dto.RegisterRequestDTO;
+import com.sports.api.dto.UpdatePersonalDataRequestDTO;
 import com.sports.api.dto.UserLoginDataDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -109,5 +111,42 @@ public class UserRepository {
         String statement = "SELECT generate_recommendations(?::uuid)";
 
         return jdbcTemplate.queryForObject(statement, UUID.class, profileId);
+    }
+
+    public Boolean updatePersonalData(UUID userId, UpdatePersonalDataRequestDTO dto) {
+        String sql = "SELECT update_user_personal_data(?::uuid, ?::varchar, ?::varchar, ?::varchar, ?::text)";
+
+        return jdbcTemplate.queryForObject(
+                sql,
+                Boolean.class,
+                userId,
+                dto.firstName(),
+                dto.lastName(),
+                dto.phone(),
+                dto.address()
+        );
+    }
+
+    public PersonalDataResponseDTO getPersonalData(UUID userId) {
+        String sql = """
+                SELECT first_name, last_name, email, phone, address,
+                       TO_CHAR(birth_date, 'YYYY-MM-DD') AS birth_date
+                FROM   users
+                WHERE  id = ?::uuid
+                """;
+
+        return jdbcTemplate.query(sql, rs -> {
+            if (rs.next()) {
+                return new PersonalDataResponseDTO(
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("birth_date")
+                );
+            }
+            return null;
+        }, userId);
     }
 }
