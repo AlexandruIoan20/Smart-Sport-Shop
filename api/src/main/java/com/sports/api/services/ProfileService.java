@@ -34,6 +34,9 @@ public class ProfileService {
             String msg = getString(e);
 
             throw new RuntimeException("PROFILE_UPDATE_ERROR: " + msg);
+        } catch (Exception e) {
+            System.out.println("PROFILE_UPDATE_ERROR: " + e.getMessage());
+            throw new RuntimeException(e);
         }
         return userId;
     }

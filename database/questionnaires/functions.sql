@@ -107,3 +107,154 @@ BEGIN
     ORDER BY compatibility_score DESC;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION calculate_product_recommendations(p_session_id UUID)
+RETURNS TABLE (
+    product_id    UUID,
+    product_name  VARCHAR,
+    category_id   UUID,
+    category_name VARCHAR,
+    sport_id      UUID,
+    sport_name    VARCHAR,
+    price         NUMERIC,
+    brand         VARCHAR,
+    image_url     VARCHAR,
+    target_level  VARCHAR,
+    reason        VARCHAR
+) AS $$
+DECLARE
+    v_user_id      UUID;
+    v_budget_min   NUMERIC;
+    v_budget_max   NUMERIC;
+    v_user_level   current_level_type;
+BEGIN
+    SELECT rs.user_id, rs.user_level_at_time::current_level_type
+    INTO   v_user_id, v_user_level
+    FROM   recommendation_sessions rs
+    WHERE  rs.id = p_session_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'SESSION_NOT_FOUND'
+            USING ERRCODE = 'P0301';
+    END IF;
+
+    SELECT up.budget_min, up.budget_max
+    INTO   v_budget_min, v_budget_max
+    FROM   user_profiles up
+    WHERE  up.user_id = v_user_id
+    ORDER BY up.updated_at DESC
+    LIMIT 1;
+
+    RETURN QUERY
+    WITH
+    recommended_sports AS (
+        SELECT rsp.sport_id,
+               rsp.compatibility_score,
+               rsp.rank
+        FROM   recommendation_sports rsp
+        WHERE  rsp.session_id = p_session_id
+    ),
+
+    candidate_products AS (
+        SELECT
+            p.id                     AS product_id,
+            p.name                   AS product_name,
+            p.category_id,
+            cat.name                 AS category_name,
+            p.sport_id,
+            s.name                   AS sport_name,
+            p.price,
+            p.brand,
+            p.image_url,
+            p.target_level,
+            st.quantity              AS stock_quantity,
+            rec.compatibility_score  AS sport_score,
+            rec.rank                 AS sport_rank,
+
+            (
+                CASE p.target_level
+                    WHEN v_user_level::TEXT THEN 40
+                    WHEN CASE v_user_level
+                            WHEN 'BEGINNER'     THEN 'INTERMEDIATE'
+                            WHEN 'INTERMEDIATE' THEN 'ADVANCED'
+                            WHEN 'ADVANCED'     THEN 'INTERMEDIATE'
+                        END THEN 20
+                    ELSE 0
+                END
+
+                + CASE
+                    WHEN p.price BETWEEN v_budget_min AND v_budget_max           THEN 30
+                    WHEN p.price < v_budget_min                                  THEN 10
+                    WHEN p.price > v_budget_max AND p.price <= v_budget_max * 1.2 THEN 5
+                    ELSE 0
+                  END
+
+                + CASE rec.rank
+                    WHEN 1 THEN 20
+                    WHEN 2 THEN 15
+                    WHEN 3 THEN 10
+                    WHEN 4 THEN 5
+                    ELSE 3
+                  END
+
+                + CASE
+                    WHEN st.quantity > 10 THEN 10
+                    WHEN st.quantity > 0  THEN 5
+                    ELSE 0
+                  END
+            ) AS product_score
+
+        FROM   products p
+        JOIN   categories       cat ON cat.id   = p.category_id
+        JOIN   sports           s   ON s.id     = p.sport_id
+        JOIN   stock            st  ON st.product_id = p.id
+        JOIN   recommended_sports rec ON rec.sport_id = p.sport_id
+        WHERE  p.is_active    = true
+          AND  st.quantity    > 0
+          AND  p.price        <= v_budget_max * 1.2
+    ),
+
+    best_per_category AS (
+        SELECT DISTINCT ON (cp.category_id)
+            cp.product_id,
+            cp.product_name,
+            cp.category_id,
+            cp.category_name,
+            cp.sport_id,
+            cp.sport_name,
+            cp.price,
+            cp.brand,
+            cp.image_url,
+            cp.target_level,
+            cp.product_score,
+            cp.sport_rank
+        FROM   candidate_products cp
+        ORDER BY
+            cp.category_id,
+            cp.product_score DESC,
+            cp.price ASC
+    )
+
+    SELECT
+        bpc.product_id,
+        bpc.product_name,
+        bpc.category_id,
+        bpc.category_name,
+        bpc.sport_id,
+        bpc.sport_name,
+        bpc.price,
+        bpc.brand,
+        bpc.image_url,
+        bpc.target_level,
+
+        (
+            'Recomandat pentru ' || bpc.sport_name ||
+            ' | Nivel: '         || bpc.target_level ||
+            ' | Scor: '          || bpc.product_score::TEXT
+        )::VARCHAR AS reason
+
+    FROM   best_per_category bpc
+    ORDER BY bpc.sport_rank ASC, bpc.product_score DESC;
+
+END;
+$$ LANGUAGE plpgsql;
