@@ -17,6 +17,7 @@ import MainLayout from './components/MainLayout.tsx'
 import SportPage from './pages/SportPage.tsx'
 import SportProductsPage from './pages/SportsProductPage.tsx'
 import RecommendationsPage from './pages/RecommendationsPage/RecommendationsPage.tsx'
+import OrderPage from './pages/OrderPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "/recommendations",
         element: <RecommendationsPage />,
+      }, 
+      { 
+        path: "/order", 
+        element: <OrderPage />,
       }
     ],
   },

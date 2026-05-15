@@ -8,9 +8,11 @@
 \i /docker-entrypoint-initdb.d/products/functions.sql
 \i /docker-entrypoint-initdb.d/sports/functions.sql
 \i /docker-entrypoint-initdb.d/questionnaires/functions.sql
+\i /docker-entrypoint-initdb.d/orders/functions.sql
 
 \i /docker-entrypoint-initdb.d/questionnaires/procedures.sql
 \i /docker-entrypoint-initdb.d/questionnaires/triggers.sql
+\i /docker-entrypoint-initdb.d/orders/triggers.sql
 
 \i /docker-entrypoint-initdb.d/seed/sports_seed.sql
 \i /docker-entrypoint-initdb.d/seed/sports_criteria_seed.sql

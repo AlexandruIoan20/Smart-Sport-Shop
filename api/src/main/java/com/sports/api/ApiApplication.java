@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootApplication
 public class ApiApplication {
-
 	private final JdbcTemplate jdbcTemplate;
 	private final Environment   environment;
 

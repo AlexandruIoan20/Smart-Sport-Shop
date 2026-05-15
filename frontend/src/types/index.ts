@@ -63,3 +63,21 @@ export interface FullRecommendation {
   sports:    RecommendedSport[];
   products:  RecommendedProduct[];
 }
+
+export interface CartItem {
+  productId: string;
+  productName: string;
+  brand: string;
+  imageUrl: string | null;
+  quantityInCart: number;
+  unitPrice: number;
+  stockAvailable: number;
+}
+
+export interface OrderCart {
+  orderId: string;
+  orderStatus: string;
+  totalAmount: number;
+  shippingAddress: string;
+  items: CartItem[];
+}

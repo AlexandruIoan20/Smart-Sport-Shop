@@ -12,12 +12,20 @@ import {
   ShoppingCart,
   Package,
   Trophy,
+  Check,
+  Loader2,
 } from "lucide-react";
+
+type AddToCartState = "idle" | "loading" | "success" | "error";
 
 export default function ProductPage() {
   const { productId } = useParams();
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [addState, setAddState] = useState<AddToCartState>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     async function fetchProduct() {
@@ -27,7 +35,6 @@ export default function ProductPage() {
         );
 
         const data = await response.json();
-
         setProduct(data);
       } catch (error) {
         console.error(error);
@@ -36,6 +43,44 @@ export default function ProductPage() {
 
     fetchProduct();
   }, [productId]);
+
+  async function handleAddToCart() {
+    if (!userId || !productId) return;
+
+    try {
+      setAddState("loading");
+      setErrorMessage(null);
+
+      const response = await fetch(
+        `http://localhost:8081/api/orders/users/${userId}/items/${productId}`,
+        { method: "POST" }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Eroare server: ${response.status}`);
+      }
+
+      const success: boolean = await response.json();
+
+      if (!success) {
+        throw new Error("Produsul nu a putut fi adăugat.");
+      }
+
+      setAddState("success");
+
+      // Resetează la idle după 2 secunde
+      setTimeout(() => setAddState("idle"), 2000);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(err instanceof Error ? err.message : "Eroare necunoscută.");
+      setAddState("error");
+
+      setTimeout(() => {
+        setAddState("idle");
+        setErrorMessage(null);
+      }, 3000);
+    }
+  }
 
   if (!product) {
     return (
@@ -46,6 +91,9 @@ export default function ProductPage() {
   }
 
   const isOutOfStock = product.stockQuantity === 0;
+  const isLoading = addState === "loading";
+  const isSuccess = addState === "success";
+  const isError = addState === "error";
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white px-6 py-10">
@@ -80,13 +128,9 @@ export default function ProductPage() {
               </Badge>
 
               {isOutOfStock ? (
-                <Badge variant="destructive">
-                  Stoc epuizat
-                </Badge>
+                <Badge variant="destructive">Stoc epuizat</Badge>
               ) : (
-                <Badge className="bg-green-600">
-                  În stoc
-                </Badge>
+                <Badge className="bg-green-600">În stoc</Badge>
               )}
             </div>
 
@@ -101,19 +145,14 @@ export default function ProductPage() {
             </div>
 
             <div className="flex flex-col gap-3 text-zinc-300">
-              
               <div className="flex items-center gap-2">
                 <Package className="w-5 h-5" />
-                <span>
-                  Categorie: {product.categoryName}
-                </span>
+                <span>Categorie: {product.categoryName}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Trophy className="w-5 h-5" />
-                <span>
-                  Sport: {product.sportName}
-                </span>
+                <span>Sport: {product.sportName}</span>
               </div>
 
               <div>
@@ -125,22 +164,55 @@ export default function ProductPage() {
             </div>
 
             <div className="pt-4 border-t border-zinc-800">
-              
               <div className="text-5xl font-bold mb-6">
                 {product.price}
-                <span className="text-2xl text-zinc-400 ml-2">
-                  RON
-                </span>
+                <span className="text-2xl text-zinc-400 ml-2">RON</span>
               </div>
 
               <Button
-                disabled={isOutOfStock}
-                className="bg-blue-600 hover:bg-blue-700 text-white h-12 px-8 text-lg"
+                onClick={handleAddToCart}
+                disabled={isOutOfStock || isLoading || isSuccess}
+                className={`h-12 px-8 text-lg transition-all duration-300 ${
+                  isSuccess
+                    ? "bg-green-600 hover:bg-green-600 cursor-default"
+                    : isError
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } text-white`}
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
+                {isLoading && (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Se adaugă...
+                  </>
+                )}
 
-                Adaugă în comandă
+                {isSuccess && (
+                  <>
+                    <Check className="w-5 h-5 mr-2" />
+                    Adăugat în coș!
+                  </>
+                )}
+
+                {isError && (
+                  <>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Încearcă din nou
+                  </>
+                )}
+
+                {addState === "idle" && (
+                  <>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    {isOutOfStock ? "Stoc epuizat" : "Adaugă în comandă"}
+                  </>
+                )}
               </Button>
+
+              {/* ERROR MESSAGE */}
+              {isError && errorMessage && (
+                <p className="mt-3 text-red-400 text-sm">{errorMessage}</p>
+              )}
             </div>
           </div>
         </div>

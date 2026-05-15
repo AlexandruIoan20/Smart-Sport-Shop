@@ -2,18 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
-import {
-  Dumbbell,
-  Search,
-  Trophy,
-  User,
-  ShoppingCart,
-} from "lucide-react";
-
+import { Dumbbell, Search, Trophy, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
+import CartDropdown from "./CartDropdown";
 import type { Product } from "@/types";
 
 export default function Navbar() {
@@ -44,7 +36,6 @@ export default function Navbar() {
     };
   }, []);
 
-  // SEARCH PRODUCTS
   useEffect(() => {
     async function fetchProducts() {
       if (search.trim().length < 2) {
@@ -56,9 +47,7 @@ export default function Navbar() {
         setLoading(true);
 
         const response = await fetch(
-          `http://localhost:8081/api/products/search?name=${encodeURIComponent(
-            search
-          )}`
+          `http://localhost:8081/api/products/search?name=${encodeURIComponent(search)}`
         );
 
         const data = await response.json();
@@ -87,23 +76,19 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
-        
+
         {/* LOGO */}
         <Link
           to="/dashboard"
           className="flex items-center gap-2 text-white font-bold text-xl"
         >
           <Dumbbell className="w-6 h-6 text-blue-500" />
-
           <span>SportHub</span>
         </Link>
 
         {/* NAVIGATION */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-300">
-          <Link
-            to="/dashboard"
-            className="hover:text-white transition-colors"
-          >
+          <Link to="/dashboard" className="hover:text-white transition-colors">
             Dashboard
           </Link>
 
@@ -112,16 +97,12 @@ export default function Navbar() {
             className="hover:text-white transition-colors flex items-center gap-1"
           >
             <Trophy className="w-4 h-4" />
-
             Sporturi
           </Link>
         </nav>
 
         {/* SEARCH */}
-        <div
-          ref={searchRef}
-          className="flex-1 max-w-xl relative"
-        >
+        <div ref={searchRef} className="flex-1 max-w-xl relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
 
@@ -141,11 +122,8 @@ export default function Navbar() {
           {/* DROPDOWN */}
           {showDropdown && (
             <div className="absolute top-12 w-full bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
-              
               {loading && (
-                <div className="p-4 text-zinc-400 text-sm">
-                  Se caută...
-                </div>
+                <div className="p-4 text-zinc-400 text-sm">Se caută...</div>
               )}
 
               {!loading && results.length === 0 && search.length >= 2 && (
@@ -158,16 +136,11 @@ export default function Navbar() {
                 results.map((product) => (
                   <button
                     key={product.productId}
-                    onClick={() =>
-                      handleSelectProduct(product.productId)
-                    }
+                    onClick={() => handleSelectProduct(product.productId)}
                     className="w-full flex items-center gap-3 p-3 hover:bg-zinc-800 transition-colors text-left"
                   >
                     <img
-                      src={
-                        product.imageUrl ??
-                        "https://placehold.co/100x100"
-                      }
+                      src={product.imageUrl ?? "https://placehold.co/100x100"}
                       alt={product.name}
                       className="w-14 h-14 rounded-lg object-cover"
                     />
@@ -176,7 +149,6 @@ export default function Navbar() {
                       <div className="text-white font-medium truncate">
                         {product.name}
                       </div>
-
                       <div className="text-zinc-400 text-sm truncate">
                         {product.brand}
                       </div>
@@ -193,14 +165,8 @@ export default function Navbar() {
 
         {/* ACTIONS */}
         <div className="flex items-center gap-3">
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-zinc-300 hover:text-white hover:bg-zinc-800"
-          >
-            <ShoppingCart className="w-5 h-5" />
-          </Button>
+          {/* CART DROPDOWN — componentă separată */}
+          <CartDropdown />
 
           <Link to="/profile">
             <Button
@@ -208,7 +174,6 @@ export default function Navbar() {
               className="border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
             >
               <User className="w-4 h-4 mr-2" />
-
               Profil
             </Button>
           </Link>
