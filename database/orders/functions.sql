@@ -274,3 +274,46 @@ BEGIN
     RETURN TRUE;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION get_user_order_history(p_user_id UUID)
+RETURNS TABLE (
+    order_id         UUID,
+    status           order_status_type,
+    total_amount     NUMERIC(10, 2),
+    shipping_address TEXT,
+    created_at       TIMESTAMP,
+    updated_at       TIMESTAMP,
+    session_id       UUID,
+    item_count       BIGINT,
+    items            JSONB
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o.id AS order_id,
+        o.status,
+        o.total_amount,
+        o.shipping_address,
+        o.created_at,
+        o.updated_at,
+        o.session_id,
+        COUNT(oi.id) AS item_count,
+        JSONB_AGG(
+            JSONB_BUILD_OBJECT(
+                'productId',  oi.product_id,
+                'productName', p.name,
+                'quantity',   oi.quantity,
+                'unitPrice',  oi.unit_price,
+                'imageUrl',   p.image_url
+            )
+        ) AS items
+    FROM orders o
+    JOIN order_items oi ON oi.order_id = o.id
+    JOIN products p     ON p.id = oi.product_id
+    WHERE o.user_id = p_user_id
+    GROUP BY o.id
+    ORDER BY o.created_at DESC;
+END;
+$$;

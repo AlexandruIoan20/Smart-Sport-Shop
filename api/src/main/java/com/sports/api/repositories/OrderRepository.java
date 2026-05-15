@@ -2,8 +2,11 @@ package com.sports.api.repositories;
 
 import com.sports.api.dto.CartItemDTO;
 import com.sports.api.dto.OrderCartDTO;
+import com.sports.api.dto.OrderHistoryDTO;
+import com.sports.api.dto.OrderItemDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,9 +16,11 @@ import java.util.UUID;
 @Repository
 public class OrderRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper;
 
-    public OrderRepository(JdbcTemplate jdbcTemplate) {
+    public OrderRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public UUID createPendingOrder(UUID userId, String shippingAddress) {
@@ -119,6 +124,42 @@ public class OrderRepository {
                 orderId,
                 userId
         );
+    }
+
+    public List<OrderHistoryDTO> getOrderHistory(UUID userId) {
+        String sql = "SELECT * FROM get_user_order_history(?::uuid)";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String itemsJson = rs.getString("items");
+            List<OrderItemDTO> items = parseItems(itemsJson);
+
+            return new OrderHistoryDTO(
+                    UUID.fromString(rs.getString("order_id")),
+                    rs.getString("status"),
+                    rs.getBigDecimal("total_amount"),
+                    rs.getString("shipping_address"),
+                    rs.getTimestamp("created_at").toLocalDateTime(),
+                    rs.getTimestamp("updated_at").toLocalDateTime(),
+                    rs.getString("session_id") != null
+                            ? UUID.fromString(rs.getString("session_id"))
+                            : null,
+                    rs.getLong("item_count"),
+                    items
+            );
+        }, userId);
+    }
+
+    private List<OrderItemDTO> parseItems(String json) {
+        if (json == null) return List.of();
+        try {
+            return objectMapper.readValue(
+                    json,
+                    objectMapper.getTypeFactory()
+                            .constructCollectionType(List.class, OrderItemDTO.class)
+            );
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 
     public Boolean cancelOrder(UUID orderId, UUID userId) {

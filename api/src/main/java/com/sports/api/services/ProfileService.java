@@ -28,8 +28,6 @@ public class ProfileService {
 
         try {
             UUID profileId = userRepository.completeProfile(userId, dto);
-            userRepository.generateRecommendations(profileId);
-
         } catch (DataAccessException e) {
             String msg = getString(e);
 

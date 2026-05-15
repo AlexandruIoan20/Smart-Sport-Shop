@@ -1,10 +1,12 @@
 package com.sports.api.services;
 
 import com.sports.api.dto.FullRecommendationDTO;
+import com.sports.api.dto.RecommendationSessionHistoryDTO;
 import com.sports.api.repositories.RecommendationsRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,5 +44,9 @@ public class RecommendationsService {
 
             throw new RuntimeException("RECOMMENDATIONS_ERROR: " + msg);
         }
+    }
+
+    public List<RecommendationSessionHistoryDTO> getRecommendationHistory(UUID userId) {
+        return recommendationsRepository.getRecommendationHistory(userId);
     }
 }

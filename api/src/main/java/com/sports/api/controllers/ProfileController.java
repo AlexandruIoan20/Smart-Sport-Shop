@@ -43,7 +43,7 @@ public class ProfileController {
                     .body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError()
-                    .body(Map.of("error", e.getMessage()));
+                    .body(Map.of("error", e));
         }
     }
 }

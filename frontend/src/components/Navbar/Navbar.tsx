@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CartDropdown from "./CartDropdown";
 import type { Product } from "@/types";
+import HistoryDropdown from "./HistoryDropdown";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -163,9 +164,8 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* ACTIONS */}
         <div className="flex items-center gap-3">
-          {/* CART DROPDOWN — componentă separată */}
+          <HistoryDropdown />
           <CartDropdown />
 
           <Link to="/profile">

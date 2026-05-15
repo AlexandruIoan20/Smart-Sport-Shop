@@ -1,19 +1,24 @@
 package com.sports.api.repositories;
 
 import com.sports.api.dto.FullRecommendationDTO;
+import com.sports.api.dto.RecommendationSessionHistoryDTO;
 import com.sports.api.dto.RecommendedProductDTO;
 import com.sports.api.dto.RecommendedSportDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
 @Repository
 public class RecommendationsRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper;
 
-    public RecommendationsRepository(JdbcTemplate jdbcTemplate) {
+    public RecommendationsRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.objectMapper = objectMapper;
     }
 
     public UUID getLatestSessionByUser(UUID userId) {
@@ -80,5 +85,36 @@ public class RecommendationsRepository {
 
             return result;
         }, sessionId);
+    }
+
+    public List<RecommendationSessionHistoryDTO> getRecommendationHistory(UUID userId) {
+        String sql = "SELECT * FROM get_user_recommendation_history(?::uuid)";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            List<RecommendedSportDTO> sports =
+                    parseJson(rs.getString("sports"), RecommendedSportDTO.class);
+
+            List<RecommendedProductDTO> products =
+                    parseJson(rs.getString("products"), RecommendedProductDTO.class);
+
+            return new RecommendationSessionHistoryDTO(
+                    UUID.fromString(rs.getString("session_id")),
+                    rs.getTimestamp("created_at").toLocalDateTime(),
+                    rs.getString("user_level_at_time"),
+                    sports,
+                    products
+            );
+        }, userId);
+    }
+
+    private <T> List<T> parseJson(String json, Class<T> elementClass) {
+        if (json == null) return List.of();
+        try {
+            JavaType type = objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, elementClass);
+            return objectMapper.readValue(json, type);
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

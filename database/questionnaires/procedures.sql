@@ -23,7 +23,6 @@ BEGIN
     VALUES (v_user_id, p_profile_id, v_computed_level)
     RETURNING id INTO v_session_id;
 
-    -- Inseram sporturile recomandate
     FOR v_sport IN
         SELECT sport_id, compatibility_score
         FROM   calculate_sport_scores(p_profile_id)

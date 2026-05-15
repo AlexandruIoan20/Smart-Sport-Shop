@@ -239,7 +239,7 @@ export default function ProfileForm() {
       localStorage.setItem("sessionId", data.sessionId)
       
       window.dispatchEvent(new Event("profile-saved"))
-      navigate("/recommendations")
+      navigate("/recommendations-history")
 
     } catch {
       alert("Eroare conexiune server.")

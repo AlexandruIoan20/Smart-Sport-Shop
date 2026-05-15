@@ -107,12 +107,6 @@ public class UserRepository {
         }, userId);
     }
 
-    public UUID generateRecommendations(UUID profileId) {
-        String statement = "SELECT generate_recommendations(?::uuid)";
-
-        return jdbcTemplate.queryForObject(statement, UUID.class, profileId);
-    }
-
     public Boolean updatePersonalData(UUID userId, UpdatePersonalDataRequestDTO dto) {
         String sql = "SELECT update_user_personal_data(?::uuid, ?::varchar, ?::varchar, ?::varchar, ?::text)";
 

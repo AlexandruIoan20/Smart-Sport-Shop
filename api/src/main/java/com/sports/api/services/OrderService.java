@@ -1,9 +1,11 @@
 package com.sports.api.services;
 
 import com.sports.api.dto.OrderCartDTO;
+import com.sports.api.dto.OrderHistoryDTO;
 import com.sports.api.repositories.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,6 +36,10 @@ public class OrderService {
             throw new IllegalArgumentException("Cantitatea trebuie să fie cel puțin 1.");
         }
         return orderRepository.updateItemQuantity(orderId, productId, newQuantity);
+    }
+
+    public List<OrderHistoryDTO> getOrderHistory(UUID userId) {
+        return orderRepository.getOrderHistory(userId);
     }
 
     public OrderCartDTO getPendingOrderWithItems(UUID userId) {

@@ -2,11 +2,13 @@ package com.sports.api.controllers;
 
 import com.sports.api.dto.CreateOrderRequestDTO;
 import com.sports.api.dto.OrderCartDTO;
+import com.sports.api.dto.OrderHistoryDTO;
 import com.sports.api.dto.UpdateQuantityRequestDTO;
 import com.sports.api.services.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -55,6 +57,15 @@ public class OrderController {
 
         Boolean success = orderService.updateItemQuantity(orderId, productId, request.quantity());
         return ResponseEntity.ok(success);
+    }
+
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<List<OrderHistoryDTO>> getOrderHistory(@PathVariable UUID userId) {
+        List<OrderHistoryDTO> history = orderService.getOrderHistory(userId);
+        if (history.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(history);
     }
 
     @DeleteMapping("/{orderId}/items/{productId}")

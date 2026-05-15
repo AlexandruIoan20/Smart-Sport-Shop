@@ -349,3 +349,70 @@ BEGIN
     RETURN v_session_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_user_recommendation_history(p_user_id UUID)
+RETURNS TABLE (
+    session_id          UUID,
+    created_at          TIMESTAMP,
+    user_level_at_time  current_level_type,
+    sports              JSONB,
+    products            JSONB
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        rs.id                           AS session_id,
+        rs.created_at,
+        rs.user_level_at_time,
+
+        COALESCE(
+            (
+                SELECT JSONB_AGG(
+                    JSONB_BUILD_OBJECT(
+                        'sportId',            sp.id,
+                        'sportName',          sp.name,
+                        'sportDescription',   sp.description,
+                        'imageUrl',           sp.image_url,
+                        'isTeamSport',        sp.is_team_sport,
+                        'isOutdoor',          sp.is_outdoor,
+                        'effortLevel',        sp.effort_level,
+                        'compatibilityScore', rsp.compatibility_score,
+                        'rank',               rsp.rank
+                    ) ORDER BY rsp.rank ASC
+                )
+                FROM recommendation_sports rsp
+                JOIN sports sp ON sp.id = rsp.sport_id
+                WHERE rsp.session_id = rs.id
+            ),
+            '[]'::JSONB
+        )                               AS sports,
+
+        COALESCE(
+            (
+                SELECT JSONB_AGG(
+                    JSONB_BUILD_OBJECT(
+                        'productId',   p.id,
+                        'productName', p.name,
+                        'imageUrl',    p.image_url,
+                        'price',       p.price,
+                        'brand',       p.brand,
+                        'reason',      rp.reason,
+                        'sportId',     sp2.id,
+                        'sportName',   sp2.name
+                    )
+                )
+                FROM recommendation_products rp
+                JOIN products p  ON p.id  = rp.product_id
+                JOIN sports sp2  ON sp2.id = rp.sport_id
+                WHERE rp.session_id = rs.id
+            ),
+            '[]'::JSONB
+        )                               AS products
+
+    FROM recommendation_sessions rs
+    WHERE rs.user_id = p_user_id
+    ORDER BY rs.created_at DESC;
+END;
+$$;

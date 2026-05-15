@@ -46,12 +46,6 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
-    @PostMapping("/{userId}/recommendations")
-    public ResponseEntity<UUID> generateRecommendations(@PathVariable UUID userId) {
-        UUID sessionId = userService.generateRecommendations(userId);
-        return ResponseEntity.ok(sessionId);
-    }
-
     @GetMapping("/{userId}/personal-data")
     public ResponseEntity<PersonalDataResponseDTO> getPersonalData(@PathVariable UUID userId) {
         PersonalDataResponseDTO data = userService.getPersonalData(userId);

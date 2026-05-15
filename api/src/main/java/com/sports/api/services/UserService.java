@@ -39,10 +39,6 @@ public class UserService {
         return userRepository.getUserProfile(userId);
     }
 
-    public UUID generateRecommendations(UUID profileId) {
-        return userRepository.generateRecommendations(profileId);
-    }
-
     public Boolean updatePersonalData(UUID userId, UpdatePersonalDataRequestDTO dto) {
         if (dto.firstName() == null || dto.firstName().trim().isEmpty()) {
             throw new IllegalArgumentException("Prenumele este obligatoriu.");

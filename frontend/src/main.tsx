@@ -18,6 +18,8 @@ import SportProductsPage from './pages/SportsProductPage.tsx'
 import RecommendationsPage from './pages/RecommendationsPage/RecommendationsPage.tsx'
 import OrderPage from './pages/OrderPage.tsx'
 import ProfilePage from './pages/ProfilePage/ProfilePage.tsx'
+import OrderHistoryPage from './pages/OrderHistoryPage.tsx'
+import RecommendationsHistoryPage from './pages/RecommendationsHistoryPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -56,6 +58,14 @@ const router = createBrowserRouter([
       { 
         path: "/order", 
         element: <OrderPage />,
+      }, 
+      { 
+        path: "/order-history",
+        element: <OrderHistoryPage />,
+      }, 
+      { 
+        path: "/recommendations-history",
+        element: <RecommendationsHistoryPage />,
       }
     ],
   },
