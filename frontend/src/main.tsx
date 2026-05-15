@@ -21,68 +21,34 @@ import ProfilePage from './pages/ProfilePage/ProfilePage.tsx'
 import OrderHistoryPage from './pages/OrderHistoryPage.tsx'
 import RecommendationsHistoryPage from './pages/RecommendationsHistoryPage.tsx'
 import AdminPage from './pages/AdminPage.tsx'
+import ProtectedRoute from './components/ProtectedRoute.tsx'
 
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
     children: [
-      {
-        path: "/",
-        element: <App />,
-      },
+      { path: "/", element: <App /> },
+      { path: "/dashboard", element: <DashboardPage /> },
+      { path: "/sports", element: <SportPage /> },
+      { path: "/products/:productId", element: <ProductPage /> },
+      { path: "/sports/:sportId/products", element: <SportProductsPage /> },
 
       {
-        path: "/dashboard",
-        element: <DashboardPage />,
-      },
-
-      {
-        path: "/profile",
-        element: <ProfilePage />,
-      },
-      {
-        path: "/products/:productId",
-        element: <ProductPage />,
-      },
-      {
-        path: "/sports",
-        element: <SportPage />,
-      },
-      {
-        path: "/sports/:sportId/products", 
-        element: <SportProductsPage />, 
-      }, 
-      {
-        path: "/recommendations",
-        element: <RecommendationsPage />,
-      }, 
-      { 
-        path: "/order", 
-        element: <OrderPage />,
-      }, 
-      { 
-        path: "/order-history",
-        element: <OrderHistoryPage />,
-      }, 
-      { 
-        path: "/recommendations-history",
-        element: <RecommendationsHistoryPage />,
-      },
-      { 
-        path: "/admin", 
-        element: <AdminPage />,
+        element: <ProtectedRoute />,
+        children: [
+          { path: "/profile", element: <ProfilePage /> },
+          { path: "/recommendations", element: <RecommendationsPage /> },
+          { path: "/order", element: <OrderPage /> },
+          { path: "/order-history", element: <OrderHistoryPage /> },
+          { path: "/recommendations-history", element: <RecommendationsHistoryPage /> },
+          { path: "/admin", element: <AdminPage /> } 
+        ]
       }
     ],
   },
 
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
+  { path: "/login", element: <Login /> },
+  { path: "/register", element: <Register /> },
 ])
 
 createRoot(document.getElementById('root')!).render(

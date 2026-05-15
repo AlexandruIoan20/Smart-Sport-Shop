@@ -40,7 +40,7 @@ export default function Login() {
       localStorage.setItem("userId", data.userId)
       
       alert("Te-ai logat cu succes!")
-      navigate("/") 
+      navigate("/dashboard") 
       
     } catch (error) {
       alert("Serverul nu răspunde. Verifică dacă Spring Boot rulează.")

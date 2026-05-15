@@ -1,14 +1,11 @@
-// src/components/layout/Navbar.tsx
-
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Dumbbell, Search, Trophy, User } from "lucide-react";
+import { Dumbbell, Search, Trophy, User, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CartDropdown from "./CartDropdown";
 import type { Product } from "@/types";
 import HistoryDropdown from "./HistoryDropdown";
-import { Shield } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -20,7 +17,8 @@ export default function Navbar() {
 
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // CLOSE DROPDOWN ON OUTSIDE CLICK
+  const isLoggedIn = Boolean(localStorage.getItem("userId"));
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -32,10 +30,7 @@ export default function Navbar() {
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -64,22 +59,23 @@ export default function Navbar() {
     }
 
     const timeout = setTimeout(fetchProducts, 300);
-
     return () => clearTimeout(timeout);
   }, [search]);
 
   function handleSelectProduct(productId: string) {
     setSearch("");
     setShowDropdown(false);
-
     navigate(`/products/${productId}`);
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("userId");
+    navigate("/login");
   }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/95 backdrop-blur">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
-
-        {/* LOGO */}
         <Link
           to="/dashboard"
           className="flex items-center gap-2 text-white font-bold text-xl"
@@ -88,7 +84,6 @@ export default function Navbar() {
           <span>SportHub</span>
         </Link>
 
-        {/* NAVIGATION */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-zinc-300">
           <Link to="/dashboard" className="hover:text-white transition-colors">
             Dashboard
@@ -103,7 +98,6 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* SEARCH */}
         <div ref={searchRef} className="flex-1 max-w-xl relative">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
@@ -112,16 +106,13 @@ export default function Navbar() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onFocus={() => {
-                if (results.length > 0) {
-                  setShowDropdown(true);
-                }
+                if (results.length > 0) setShowDropdown(true);
               }}
               placeholder="Caută produse..."
               className="pl-10 bg-zinc-900 border-zinc-800 text-white focus-visible:ring-blue-600"
             />
           </div>
 
-          {/* DROPDOWN */}
           {showDropdown && (
             <div className="absolute top-12 w-full bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
               {loading && (
@@ -166,27 +157,46 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link to="/admin">
-            <Button
-              variant="ghost"
-              className="text-zinc-300 hover:text-white hover:bg-zinc-800"
-              title="Admin panel"
-            >
-              <Shield className="w-4 h-4" />
-            </Button>
-          </Link>
-          <HistoryDropdown />
-          <CartDropdown />
+          {!isLoggedIn ? (
+            <Link to="/login">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                Login
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/admin">
+                <Button
+                  variant="ghost"
+                  className="text-zinc-300 hover:text-white hover:bg-zinc-800"
+                  title="Admin panel"
+                >
+                  <Shield className="w-4 h-4" />
+                </Button>
+              </Link>
 
-          <Link to="/profile">
-            <Button
-              variant="outline"
-              className="border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Profil
-            </Button>
-          </Link>
+              <HistoryDropdown />
+              <CartDropdown />
+
+              <Link to="/profile">
+                <Button
+                  variant="outline"
+                  className="border-zinc-700 bg-zinc-900 text-white hover:bg-zinc-800"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Profil
+                </Button>
+              </Link>
+
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                className="text-red-400 hover:text-red-300 hover:bg-zinc-800"
+              >
+                Logout
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

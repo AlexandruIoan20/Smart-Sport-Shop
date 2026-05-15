@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -23,6 +24,8 @@ const formSchema = z.object({
 })
 
 export default function Register() {
+  const navigate = useNavigate() 
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -56,9 +59,9 @@ export default function Register() {
         return
       }
 
-
       alert("Cont creat cu succes! ID: " + data.userId)
       form.reset()
+      navigate("/login")
       
     } catch (error) {
       console.error("Eroare de rețea:", error)
@@ -66,74 +69,83 @@ export default function Register() {
     }
   }
 
-  // 4. Interfața vizuală (Dark theme by default din clasa părinte)
   return (
-    <Card className="w-full max-w-md mx-auto bg-zinc-900 border-zinc-800 text-zinc-100 shadow-2xl">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Creează un cont</CardTitle>
-        <CardDescription className="text-zinc-400">
-          Alătură-te platformei Smart Sport Shop.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField control={form.control} name="firstName" render={({ field }) => (
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800 text-zinc-100 shadow-2xl">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Creează un cont</CardTitle>
+          <CardDescription className="text-zinc-400">
+            Alătură-te platformei Smart Sport Shop.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="firstName" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prenume</FormLabel>
+                    <FormControl><Input placeholder="Ion" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
+                    <FormMessage className="text-red-400" />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="lastName" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nume</FormLabel>
+                    <FormControl><Input placeholder="Popescu" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
+                    <FormMessage className="text-red-400" />
+                  </FormItem>
+                )} />
+              </div>
+
+              <FormField control={form.control} name="username" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prenume</FormLabel>
-                  <FormControl><Input placeholder="Ion" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl><Input placeholder="ion_sportivul" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
                   <FormMessage className="text-red-400" />
                 </FormItem>
               )} />
-              <FormField control={form.control} name="lastName" render={({ field }) => (
+
+              <FormField control={form.control} name="email" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nume</FormLabel>
-                  <FormControl><Input placeholder="Popescu" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl><Input type="email" placeholder="ion@exemplu.ro" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
                   <FormMessage className="text-red-400" />
                 </FormItem>
               )} />
-            </div>
 
-            <FormField control={form.control} name="username" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl><Input placeholder="ion_sportivul" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )} />
+              <FormField control={form.control} name="password" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Parolă</FormLabel>
+                  <FormControl><Input type="password" placeholder="••••••••" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
+                  <FormMessage className="text-red-400" />
+                </FormItem>
+              )} />
 
-            <FormField control={form.control} name="email" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl><Input type="email" placeholder="ion@exemplu.ro" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )} />
+              <FormField control={form.control} name="birthDate" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Data nașterii</FormLabel>
+                  <FormControl><Input type="date" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
+                  <FormMessage className="text-red-400" />
+                </FormItem>
+              )} />
 
-            <FormField control={form.control} name="password" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Parolă</FormLabel>
-                <FormControl><Input type="password" placeholder="••••••••" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )} />
+              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-6">
+                Înregistrare
+              </Button>
+            </form>
+          </Form>
 
-            <FormField control={form.control} name="birthDate" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Data nașterii</FormLabel>
-                <FormControl><Input type="date" className="bg-zinc-950 border-zinc-800" {...field} /></FormControl>
-                <FormMessage className="text-red-400" />
-              </FormItem>
-            )} />
-
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-6">
-              Înregistrare
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+          {/* Am adăugat și un link de întoarcere pentru consistență */}
+          <div className="mt-6 text-center text-sm">
+            <span className="text-zinc-400">Ai deja un cont? </span>
+            <button onClick={() => navigate("/login")} className="text-blue-500 hover:underline">
+              Autentifică-te
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
