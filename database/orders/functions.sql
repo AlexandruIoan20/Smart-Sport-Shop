@@ -200,3 +200,77 @@ BEGIN
     WHERE o.user_id = p_user_id AND o.status = 'PENDING';
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION confirm_order(
+    p_order_id UUID,
+    p_user_id  UUID
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_status order_status_type;
+BEGIN
+    SELECT status
+    INTO   v_status
+    FROM   orders
+    WHERE  id      = p_order_id
+      AND  user_id = p_user_id;
+
+    IF NOT FOUND THEN
+        RETURN FALSE;
+    END IF;
+
+    IF v_status <> 'PENDING' THEN
+        RETURN FALSE;
+    END IF;
+
+    UPDATE orders
+    SET    status     = 'CONFIRMED',
+           updated_at = now()
+    WHERE  id = p_order_id;
+
+    RETURN TRUE;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION cancel_order(
+    p_order_id UUID,
+    p_user_id  UUID
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_status order_status_type;
+BEGIN
+    SELECT status
+    INTO   v_status
+    FROM   orders
+    WHERE  id      = p_order_id
+      AND  user_id = p_user_id;
+
+    IF NOT FOUND THEN
+        RETURN FALSE;
+    END IF;
+
+    IF v_status NOT IN ('PENDING', 'CONFIRMED') THEN
+        RETURN FALSE;
+    END IF;
+
+    UPDATE stock s
+    SET    quantity     = s.quantity + oi.quantity,
+           last_updated = now()
+    FROM   order_items oi
+    WHERE  oi.order_id   = p_order_id
+      AND  oi.product_id = s.product_id;
+
+    UPDATE orders
+    SET    status     = 'CANCELLED',
+           updated_at = now()
+    WHERE  id = p_order_id;
+
+    RETURN TRUE;
+END;
+$$;

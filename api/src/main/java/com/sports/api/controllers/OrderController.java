@@ -26,7 +26,6 @@ public class OrderController {
         if (cart == null) {
             return ResponseEntity.noContent().build();
         }
-
         return ResponseEntity.ok(cart);
     }
 
@@ -65,5 +64,34 @@ public class OrderController {
 
         Boolean success = orderService.removeItemFromOrder(orderId, productId);
         return ResponseEntity.ok(success);
+    }
+
+    @PostMapping("/{orderId}/confirm/{userId}")
+    public ResponseEntity<Boolean> confirmOrder(
+            @PathVariable UUID orderId,
+            @PathVariable UUID userId) {
+
+        Boolean success = orderService.confirmOrder(orderId, userId);
+
+        if (Boolean.FALSE.equals(success)) {
+            // Stoc insuficient, status greșit sau comandă negăsită
+            return ResponseEntity.badRequest().body(false);
+        }
+
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping("/{orderId}/cancel/{userId}")
+    public ResponseEntity<Boolean> cancelOrder(
+            @PathVariable UUID orderId,
+            @PathVariable UUID userId) {
+
+        Boolean success = orderService.cancelOrder(orderId, userId);
+
+        if (Boolean.FALSE.equals(success)) {
+            return ResponseEntity.badRequest().body(false);
+        }
+
+        return ResponseEntity.ok(true);
     }
 }

@@ -1,5 +1,3 @@
-// src/components/layout/CartDropdown.tsx
-
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, Package } from "lucide-react";
@@ -137,7 +135,7 @@ export default function CartDropdown() {
               <div className="flex items-center justify-between mb-3">
                 <span className="text-zinc-400 text-sm">Total</span>
                 <span className="text-white font-bold">
-                  {cart.totalAmount.toFixed(2)} RON
+                  {(Number(cart.totalAmount) || 0).toFixed(2)} RON
                 </span>
               </div>
 
@@ -151,7 +149,7 @@ export default function CartDropdown() {
 
           {!loading && !cart && (
             <div className="px-4 py-3 border-t border-zinc-800">
-              <Link to="/products" onClick={() => setOpen(false)}>
+              <Link to="/dashboard" onClick={() => setOpen(false)}>
                 <Button
                   variant="outline"
                   className="w-full border-zinc-700 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white text-sm"

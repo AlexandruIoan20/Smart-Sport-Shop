@@ -39,4 +39,12 @@ public class OrderService {
     public OrderCartDTO getPendingOrderWithItems(UUID userId) {
         return orderRepository.getPendingOrderWithItems(userId);
     }
+
+    public Boolean confirmOrder(UUID orderId, UUID userId) {
+        return orderRepository.confirmOrder(orderId, userId);
+    }
+
+    public Boolean cancelOrder(UUID orderId, UUID userId) {
+        return orderRepository.cancelOrder(orderId, userId);
+    }
 }

@@ -109,4 +109,26 @@ public class OrderRepository {
             );
         }, userId);
     }
+
+    public Boolean confirmOrder(UUID orderId, UUID userId) {
+        String sql = "SELECT confirm_order(?::uuid, ?::uuid)";
+
+        return jdbcTemplate.queryForObject(
+                sql,
+                Boolean.class,
+                orderId,
+                userId
+        );
+    }
+
+    public Boolean cancelOrder(UUID orderId, UUID userId) {
+        String sql = "SELECT cancel_order(?::uuid, ?::uuid)";
+
+        return jdbcTemplate.queryForObject(
+                sql,
+                Boolean.class,
+                orderId,
+                userId
+        );
+    }
 }
