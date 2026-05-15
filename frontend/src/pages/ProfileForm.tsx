@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useNavigate } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -136,6 +137,8 @@ const selectCls =
   "bg-zinc-900 border-zinc-700 text-zinc-100"
 
 export default function ProfileForm() {
+  const navigate = useNavigate(); 
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
 
@@ -211,49 +214,37 @@ export default function ProfileForm() {
   async function onSubmit(values: FormValues) {
     const payload = {
       ...values,
-
-      prefersTeam:
-        values.prefersTeam === "true",
-
-      occupation:
-        values.occupation &&
-        values.occupation.trim() !== ""
-          ? values.occupation
-          : null,
-
-      medicalNotes:
-        values.medicalNotes &&
-        values.medicalNotes.trim() !== ""
-          ? values.medicalNotes
-          : null,
+      prefersTeam:  values.prefersTeam === "true",
+      occupation:   values.occupation?.trim()   || null,
+      medicalNotes: values.medicalNotes?.trim() || null,
     }
 
     try {
-      const res = await fetch(
-        "http://localhost:8081/api/profiles/complete",
-        {
-          method: "POST",
+      const res = await fetch("http://localhost:8081/api/profiles/complete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id":    USER_ID,
+        },
+        body: JSON.stringify(payload),
+      })
 
-          headers: {
-            "Content-Type": "application/json",
-            "X-User-Id": USER_ID,
-          },
-
-          body: JSON.stringify(payload),
-        }
-      )
+      const data = await res.json()
 
       if (!res.ok) {
-        alert("Eroare la salvare!")
+        alert("Eroare la salvare: " + data.error)
         return
       }
 
-      alert("Profil salvat cu succes!")
+      localStorage.setItem("sessionId", data.sessionId)
+      
+      window.dispatchEvent(new Event("profile-saved"))
+      navigate("/recommendations")
+
     } catch {
       alert("Eroare conexiune server.")
     }
   }
-
   return (
     <Card className="w-full max-w-2xl mx-auto bg-zinc-900 border-zinc-800 text-zinc-100 shadow-2xl">
       <CardHeader>

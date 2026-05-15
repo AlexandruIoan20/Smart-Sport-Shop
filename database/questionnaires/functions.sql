@@ -258,3 +258,94 @@ BEGIN
 
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION get_recommendations_by_session(p_session_id UUID)
+RETURNS TABLE (
+    session_id          UUID,
+    user_level          VARCHAR,
+    created_at          TIMESTAMP,
+    sport_id            UUID,
+    sport_name          VARCHAR,
+    sport_description   TEXT,
+    compatibility_score NUMERIC,
+    rank                INT,
+    is_team_sport       BOOLEAN,
+    is_outdoor          BOOLEAN,
+    effort_level        INT,
+    sport_image_url     VARCHAR,
+    product_id          UUID,
+    product_name        VARCHAR,
+    category_name       VARCHAR,
+    product_sport_name  VARCHAR,
+    price               NUMERIC,
+    brand               VARCHAR,
+    product_image_url   VARCHAR,
+    target_level        VARCHAR,
+    reason              VARCHAR,
+    stock_quantity      INT
+) AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM recommendation_sessions rs WHERE rs.id = p_session_id
+    ) THEN
+        RAISE EXCEPTION 'SESSION_NOT_FOUND'
+            USING ERRCODE = 'P0301';
+    END IF;
+
+    RETURN QUERY
+    SELECT
+        rs.id                    AS session_id,
+        rs.user_level_at_time::VARCHAR AS user_level,
+        rs.created_at,
+        s.id                     AS sport_id,
+        s.name                   AS sport_name,
+        s.description            AS sport_description,
+        rsp.compatibility_score,
+        rsp.rank,
+        s.is_team_sport,
+        s.is_outdoor,
+        s.effort_level,
+        s.image_url              AS sport_image_url,
+        p.id                     AS product_id,
+        p.name                   AS product_name,
+        c.name                   AS category_name,
+        ps.name                  AS product_sport_name,
+        p.price,
+        p.brand,
+        p.image_url              AS product_image_url,
+        p.target_level,
+        rpr.reason,
+        st.quantity              AS stock_quantity
+    FROM recommendation_sessions rs
+    JOIN recommendation_sports  rsp ON rsp.session_id  = rs.id
+    JOIN sports                 s   ON s.id            = rsp.sport_id
+    LEFT JOIN recommendation_products rpr ON rpr.session_id = rs.id
+    LEFT JOIN products          p   ON p.id            = rpr.product_id
+    LEFT JOIN categories        c   ON c.id            = p.category_id
+    LEFT JOIN sports            ps  ON ps.id           = p.sport_id
+    LEFT JOIN stock             st  ON st.product_id   = p.id
+    WHERE rs.id = p_session_id
+    ORDER BY rsp.rank ASC, p.id ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_latest_session_by_user(p_user_id UUID)
+RETURNS UUID AS $$
+DECLARE
+    v_session_id UUID;
+BEGIN
+    SELECT id INTO v_session_id
+    FROM   recommendation_sessions
+    WHERE  user_id = p_user_id
+    ORDER BY created_at DESC
+    LIMIT 1;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'NO_RECOMMENDATIONS_FOUND'
+            USING ERRCODE = 'P0302';
+    END IF;
+
+    RETURN v_session_id;
+END;
+$$ LANGUAGE plpgsql;

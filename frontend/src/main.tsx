@@ -14,8 +14,9 @@ import ProfileForm from './pages/ProfileForm.tsx'
 import DashboardPage from './pages/Dashboard/DashboardPage.tsx'
 import ProductPage from './pages/ProductPage.tsx'
 import MainLayout from './components/MainLayout.tsx'
-import SportPage from './pages/Sport/SportPage.tsx'
+import SportPage from './pages/SportPage.tsx'
 import SportProductsPage from './pages/SportsProductPage.tsx'
+import RecommendationsPage from './pages/RecommendationsPage/RecommendationsPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -46,11 +47,14 @@ const router = createBrowserRouter([
       {
         path: "/sports/:sportId/products", 
         element: <SportProductsPage />, 
+      }, 
+      {
+        path: "/recommendations",
+        element: <RecommendationsPage />,
       }
     ],
   },
 
-  // PAGINI FARA NAVBAR + FOOTER
   {
     path: "/login",
     element: <Login />,

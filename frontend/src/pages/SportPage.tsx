@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import SportCard from "./Components/SportCard";
+import SportCard from "../components/SportCard";
 
 type Sport = {
   sportId: string;
