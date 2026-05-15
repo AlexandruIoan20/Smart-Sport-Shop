@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import CartDropdown from "./CartDropdown";
 import type { Product } from "@/types";
 import HistoryDropdown from "./HistoryDropdown";
+import { Shield } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -165,6 +166,15 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link to="/admin">
+            <Button
+              variant="ghost"
+              className="text-zinc-300 hover:text-white hover:bg-zinc-800"
+              title="Admin panel"
+            >
+              <Shield className="w-4 h-4" />
+            </Button>
+          </Link>
           <HistoryDropdown />
           <CartDropdown />
 

@@ -20,6 +20,7 @@ import OrderPage from './pages/OrderPage.tsx'
 import ProfilePage from './pages/ProfilePage/ProfilePage.tsx'
 import OrderHistoryPage from './pages/OrderHistoryPage.tsx'
 import RecommendationsHistoryPage from './pages/RecommendationsHistoryPage.tsx'
+import AdminPage from './pages/AdminPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -66,6 +67,10 @@ const router = createBrowserRouter([
       { 
         path: "/recommendations-history",
         element: <RecommendationsHistoryPage />,
+      },
+      { 
+        path: "/admin", 
+        element: <AdminPage />,
       }
     ],
   },
