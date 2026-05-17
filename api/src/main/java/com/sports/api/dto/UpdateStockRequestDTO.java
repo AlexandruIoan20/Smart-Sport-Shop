@@ -1,5 +1,3 @@
 package com.sports.api.dto;
 
-public record UpdateStockRequestDTO(
-        Integer quantity
-) {}
+public record UpdateStockRequestDTO(Integer quantity) {}

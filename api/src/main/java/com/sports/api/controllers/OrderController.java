@@ -85,7 +85,6 @@ public class OrderController {
         Boolean success = orderService.confirmOrder(orderId, userId);
 
         if (Boolean.FALSE.equals(success)) {
-            // Stoc insuficient, status greșit sau comandă negăsită
             return ResponseEntity.badRequest().body(false);
         }
 

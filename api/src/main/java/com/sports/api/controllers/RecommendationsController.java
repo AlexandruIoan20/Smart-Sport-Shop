@@ -54,9 +54,7 @@ public class RecommendationsController {
     public ResponseEntity<List<RecommendationSessionHistoryDTO>> getRecommendationHistory(
             @PathVariable UUID userId) {
 
-        List<RecommendationSessionHistoryDTO> history =
-                recommendationsService.getRecommendationHistory(userId);
-
+        List<RecommendationSessionHistoryDTO> history = recommendationsService.getRecommendationHistory(userId);
         if (history.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import CategoryList from "./Components/CategoryList"
+import CategoryList from "./components/CategoryList"
 
 import type { Category, Product } from "@/types";
 
@@ -53,7 +53,6 @@ export default function DashboardPage() {
 
       const resolvedProducts = await Promise.all(productRequests);
 
-      // 3. transformam intr-un obiect
       const mappedProducts: Record<string, Product[]> = {};
 
       resolvedProducts.forEach((entry) => {

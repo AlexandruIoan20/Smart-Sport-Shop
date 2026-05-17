@@ -6,26 +6,24 @@ import {
 
 const API = "http://localhost:8081/api/admin";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface Category { categoryId: string; name: string; parentName: string | null; }
-interface Sport    { sportId: string; name: string; }
+interface Sport { sportId: string; name: string; }
 
 interface Product {
-  productId:    string;
-  name:         string;
+  productId: string;
+  name: string;
   description:  string | null;
-  price:        number;
-  categoryId:   string;
+  price: number;
+  categoryId: string;
   categoryName: string;
-  sportId:      string | null;
-  sportName:    string | null;
+  sportId: string | null;
+  sportName: string | null;
   targetLevel:  string;
-  brand:        string | null;
-  imageUrl:     string | null;
-  isActive:     boolean;
-  createdAt:    string;
-  stockQty:     number;
+  brand: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  createdAt: string;
+  stockQty: number;
 }
 
 const LEVELS = ["BEGINNER", "INTERMEDIATE", "ADVANCED"];
@@ -37,27 +35,21 @@ const LEVEL_LABEL: Record<string, string> = {
 };
 
 const LEVEL_COLOR: Record<string, string> = {
-  BEGINNER:     "text-emerald-400 bg-emerald-400/10",
+  BEGINNER: "text-emerald-400 bg-emerald-400/10",
   INTERMEDIATE: "text-amber-400 bg-amber-400/10",
-  ADVANCED:     "text-red-400 bg-red-400/10",
+  ADVANCED: "text-red-400 bg-red-400/10",
 };
-
-// ─── Empty form ───────────────────────────────────────────────────────────────
 
 const emptyForm = () => ({
   name: "", description: "", price: "", categoryId: "",
   sportId: "", targetLevel: "BEGINNER", brand: "", imageUrl: "", stockQty: "0",
 });
 
-// ─── Stock badge ──────────────────────────────────────────────────────────────
-
 function StockBadge({ qty }: { qty: number }) {
   if (qty === 0) return <span className="text-xs text-red-400 bg-red-400/10 px-2 py-0.5 rounded-full font-semibold">Stoc 0</span>;
   if (qty <= 5)  return <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full font-semibold">{qty} buc.</span>;
   return <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full font-semibold">{qty} buc.</span>;
 }
-
-// ─── Modal ───────────────────────────────────────────────────────────────────
 
 function Modal({
   title, onClose, children,
@@ -81,7 +73,6 @@ function Modal({
   );
 }
 
-// ─── Input helpers ────────────────────────────────────────────────────────────
 
 const cls = "w-full bg-zinc-950 border border-zinc-800 text-zinc-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-600";
 const label = (text: string, required = false) => (
@@ -89,8 +80,6 @@ const label = (text: string, required = false) => (
     {text} {required && <span className="text-red-400">*</span>}
   </label>
 );
-
-// ─── Product Form ─────────────────────────────────────────────────────────────
 
 function ProductForm({
   form, setForm, categories, sports,
@@ -168,37 +157,31 @@ function ProductForm({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default function AdminPage() {
-  const [products,   setProducts]   = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [sports,     setSports]     = useState<Sport[]>([]);
-  const [loading,    setLoading]    = useState(true);
-  const [search,     setSearch]     = useState("");
-  const [sortKey,    setSortKey]    = useState<keyof Product>("createdAt");
-  const [sortAsc,    setSortAsc]    = useState(false);
+  const [sports, setSports] = useState<Sport[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<keyof Product>("createdAt");
+  const [sortAsc, setSortAsc] = useState(false);
 
-  // Modals
-  const [showCreate,  setShowCreate]  = useState(false);
+  const [showCreate,  setShowCreate] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
-  const [stockEdit,   setStockEdit]   = useState<Product | null>(null);
-  const [stockVal,    setStockVal]    = useState("");
+  const [stockEdit, setStockEdit] = useState<Product | null>(null);
+  const [stockVal, setStockVal] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
-  // Forms
   const [createForm, setCreateForm] = useState(emptyForm());
-  const [editForm,   setEditForm]   = useState(emptyForm());
+  const [editForm, setEditForm] = useState(emptyForm());
 
-  // ─── Fetch ─────────────────────────────────────────────────────────────────
-
-    async function fetchAll() {
+  async function fetchAll() {
     setLoading(true);
     try {
         const [prodRes, catRes, sportRes] = await Promise.all([
-        fetch(`${API}/products`),
-        fetch(`${API}/categories`),
-        fetch("http://localhost:8081/api/sports"),
+          fetch(`${API}/products`),
+          fetch(`${API}/categories`),
+          fetch("http://localhost:8081/api/sports"),
         ]);
 
         const prodData = await prodRes.json();
@@ -207,13 +190,11 @@ export default function AdminPage() {
 
         console.log({ catData }); 
 
-        // Verifică structura (adaptează ".data" dacă API-ul tău folosește altă cheie, ex: ".items")
         setProducts(Array.isArray(prodData) ? prodData : prodData.data || []);
         setCategories(Array.isArray(catData) ? catData : catData.data || []);
         setSports(Array.isArray(sportData) ? sportData : sportData.data || []);
     } catch (error) {
         console.error("Eroare la încărcarea datelor:", error);
-        // Opțional: Setează state-urile la [] în caz de eroare pentru a preveni crash-uri
         setCategories([]);
         setSports([]);
     } finally {
@@ -223,22 +204,20 @@ export default function AdminPage() {
 
   useEffect(() => { fetchAll(); }, []);
 
-  // ─── Handlers ──────────────────────────────────────────────────────────────
-
   async function handleCreate() {
     await fetch(`${API}/products`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name:        createForm.name,
+        name: createForm.name,
         description: createForm.description || null,
-        price:       parseFloat(createForm.price),
-        categoryId:  createForm.categoryId,
-        sportId:     createForm.sportId || null,
+        price: parseFloat(createForm.price),
+        categoryId: createForm.categoryId,
+        sportId: createForm.sportId || null,
         targetLevel: createForm.targetLevel,
-        brand:       createForm.brand || null,
-        imageUrl:    createForm.imageUrl || null,
-        stockQty:    parseInt(createForm.stockQty) || 0,
+        brand: createForm.brand || null,
+        imageUrl: createForm.imageUrl || null,
+        stockQty: parseInt(createForm.stockQty) || 0,
       }),
     });
     setShowCreate(false);
@@ -249,15 +228,15 @@ export default function AdminPage() {
   function openEdit(p: Product) {
     setEditProduct(p);
     setEditForm({
-      name:        p.name,
+      name: p.name,
       description: p.description ?? "",
-      price:       String(p.price),
-      categoryId:  p.categoryId,
-      sportId:     p.sportId ?? "",
+      price: String(p.price),
+      categoryId: p.categoryId,
+      sportId: p.sportId ?? "",
       targetLevel: p.targetLevel,
-      brand:       p.brand ?? "",
-      imageUrl:    p.imageUrl ?? "",
-      stockQty:    String(p.stockQty),
+      brand: p.brand ?? "",
+      imageUrl: p.imageUrl ?? "",
+      stockQty: String(p.stockQty),
     });
   }
 
@@ -267,15 +246,15 @@ export default function AdminPage() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name:        editForm.name,
+        name: editForm.name,
         description: editForm.description || null,
-        price:       parseFloat(editForm.price),
-        categoryId:  editForm.categoryId,
-        sportId:     editForm.sportId || null,
+        price: parseFloat(editForm.price),
+        categoryId: editForm.categoryId,
+        sportId: editForm.sportId || null,
         targetLevel: editForm.targetLevel,
-        brand:       editForm.brand || null,
-        imageUrl:    editForm.imageUrl || null,
-        isActive:    editProduct.isActive,
+        brand: editForm.brand || null,
+        imageUrl: editForm.imageUrl || null,
+        isActive: editProduct.isActive,
       }),
     });
     setEditProduct(null);
@@ -299,8 +278,6 @@ export default function AdminPage() {
     setStockEdit(null);
     fetchAll();
   }
-
-  // ─── Sort & filter ─────────────────────────────────────────────────────────
 
   function toggleSort(key: keyof Product) {
     if (sortKey === key) setSortAsc((p) => !p);
@@ -327,8 +304,6 @@ export default function AdminPage() {
   }
 
   const thCls = "px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wide cursor-pointer hover:text-zinc-300 select-none whitespace-nowrap";
-
-  // ─── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-zinc-950 py-10 px-4">
@@ -393,7 +368,7 @@ export default function AdminPage() {
                           <img
                             src={p.imageUrl ?? "https://placehold.co/48x48"}
                             alt={p.name}
-                            className="w-10 h-10 rounded-lg object-cover bg-zinc-800 flex-shrink-0"
+                            className="w-10 h-10 rounded-lg object-cover bg-zinc-800 shrink-0"
                           />
                           <div>
                             <div className="text-white text-sm font-medium">{p.name}</div>

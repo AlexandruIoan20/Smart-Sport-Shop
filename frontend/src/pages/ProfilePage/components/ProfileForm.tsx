@@ -33,6 +33,8 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
+import { AlertCircle } from "lucide-react"
+
 import {
   GOAL_OPTIONS,
   ENVIRONMENT_OPTIONS,
@@ -47,58 +49,40 @@ const formSchema = z.object({
   medicalNotes: z.string().optional(),
 
   goal: z.enum(
-    [
-      "WEIGHT_LOSS",
-      "MUSCLE_GAIN",
-      "CARDIO",
-      "STRESS_RELIEF",
-      "FLEXIBILITY",
-    ],
-    { error: "Camp obligatoriu" }
+    ["WEIGHT_LOSS", "MUSCLE_GAIN", "CARDIO", "STRESS_RELIEF", "FLEXIBILITY"],
+    { error: "Câmp obligatoriu" }
   ),
 
   preferredEnvironment: z.enum(
     ["INDOOR", "OUTDOOR", "BOTH"],
-    { error: "Camp obligatoriu" }
+    { error: "Câmp obligatoriu" }
   ),
 
   dailySchedule: z.enum(
-    [
-      "FULL_TIME",
-      "PART_TIME",
-      "FLEXIBLE",
-      "STUDENT",
-      "RETIRED",
-    ],
-    { error: "Camp obligatoriu" }
+    ["FULL_TIME", "PART_TIME", "FLEXIBLE", "STUDENT", "RETIRED"],
+    { error: "Câmp obligatoriu" }
   ),
 
   activityLevel: z.enum(
-    [
-      "SEDENTARY",
-      "LIGHT",
-      "MODERATE",
-      "ACTIVE",
-      "VERY_ACTIVE",
-    ],
-    { error: "Camp obligatoriu" }
+    ["SEDENTARY", "LIGHT", "MODERATE", "ACTIVE", "VERY_ACTIVE"],
+    { error: "Câmp obligatoriu" }
   ),
 
   effortTolerance: z.enum(
     ["LOW", "MEDIUM", "HIGH"],
-    { error: "Camp obligatoriu" }
+    { error: "Câmp obligatoriu" }
   ),
 
   prefersTeam: z.enum(
     ["true", "false"],
-    { error: "Camp obligatoriu" }
+    { error: "Câmp obligatoriu" }
   ),
 
   freeHoursWeek: z.coerce
     .number({
       error: (issue) =>
         issue.input === undefined || issue.input === ""
-          ? "Camp obligatoriu"
+          ? "Câmp obligatoriu"
           : "Introdu un număr",
     })
     .min(0, "Minim 0")
@@ -108,7 +92,7 @@ const formSchema = z.object({
     .number({
       error: (issue) =>
         issue.input === undefined || issue.input === ""
-          ? "Camp obligatoriu"
+          ? "Câmp obligatoriu"
           : "Introdu un număr",
     })
     .min(0, "Minim 0"),
@@ -117,7 +101,7 @@ const formSchema = z.object({
     .number({
       error: (issue) =>
         issue.input === undefined || issue.input === ""
-          ? "Camp obligatoriu"
+          ? "Câmp obligatoriu"
           : "Introdu un număr",
     })
     .min(0, "Minim 0"),
@@ -130,20 +114,16 @@ type FormValues = z.infer<typeof formSchema>
 
 const USER_ID = localStorage.getItem("userId") ?? ""
 
-const inputCls =
-  "bg-zinc-950 border-zinc-800 text-zinc-100"
-
-const selectCls =
-  "bg-zinc-900 border-zinc-700 text-zinc-100"
+const inputCls = "bg-zinc-950 border-zinc-800 text-zinc-100"
+const selectCls = "bg-zinc-900 border-zinc-700 text-zinc-100"
+const msgCls = "text-red-400 text-xs"
 
 export default function ProfileForm() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate()
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-
     mode: "onSubmit",
-
     defaultValues: {
       occupation: "",
       medicalNotes: "",
@@ -155,14 +135,9 @@ export default function ProfileForm() {
 
     async function fetchProfile() {
       try {
-        const res = await fetch(
-          "http://localhost:8081/api/profiles",
-          {
-            headers: {
-              "X-User-Id": USER_ID,
-            },
-          }
-        )
+        const res = await fetch("http://localhost:8081/api/profiles", {
+          headers: { "X-User-Id": USER_ID },
+        })
 
         const data = await res.json()
 
@@ -170,37 +145,18 @@ export default function ProfileForm() {
           form.reset({
             occupation: data.occupation ?? "",
             medicalNotes: data.medicalNotes ?? "",
-
             goal: data.goal ?? undefined,
-
-            preferredEnvironment:
-              data.preferredEnvironment ?? undefined,
-
-            dailySchedule:
-              data.dailySchedule ?? undefined,
-
-            activityLevel:
-              data.activityLevel ?? undefined,
-
-            effortTolerance:
-              data.effortTolerance ?? undefined,
-
+            preferredEnvironment: data.preferredEnvironment ?? undefined,
+            dailySchedule: data.dailySchedule ?? undefined,
+            activityLevel: data.activityLevel ?? undefined,
+            effortTolerance: data.effortTolerance ?? undefined,
             prefersTeam:
-              data.prefersTeam !== null &&
-              data.prefersTeam !== undefined
-                ? String(data.prefersTeam) as
-                    | "true"
-                    | "false"
+              data.prefersTeam !== null && data.prefersTeam !== undefined
+                ? (String(data.prefersTeam) as "true" | "false")
                 : undefined,
-
-            freeHoursWeek:
-              data.freeHoursWeek ?? undefined,
-
-            budgetMin:
-              data.budgetMin ?? undefined,
-
-            budgetMax:
-              data.budgetMax ?? undefined,
+            freeHoursWeek: data.freeHoursWeek ?? undefined,
+            budgetMin: data.budgetMin ?? undefined,
+            budgetMax: data.budgetMax ?? undefined,
           })
         }
       } catch (err) {
@@ -214,8 +170,8 @@ export default function ProfileForm() {
   async function onSubmit(values: FormValues) {
     const payload = {
       ...values,
-      prefersTeam:  values.prefersTeam === "true",
-      occupation:   values.occupation?.trim()   || null,
+      prefersTeam: values.prefersTeam === "true",
+      occupation: values.occupation?.trim() || null,
       medicalNotes: values.medicalNotes?.trim() || null,
     }
 
@@ -224,7 +180,7 @@ export default function ProfileForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-Id":    USER_ID,
+          "X-User-Id": USER_ID,
         },
         body: JSON.stringify(payload),
       })
@@ -232,26 +188,27 @@ export default function ProfileForm() {
       const data = await res.json()
 
       if (!res.ok) {
-        alert("Eroare la salvare: " + data.error)
+        form.setError("root", {
+          message: data.error || "Eroare la salvarea profilului.",
+        })
         return
       }
 
       localStorage.setItem("sessionId", data.sessionId)
-      
       window.dispatchEvent(new Event("profile-saved"))
       navigate("/recommendations-history")
 
     } catch {
-      alert("Eroare conexiune server.")
+      form.setError("root", {
+        message: "Eroare conexiune server. Verifică dacă Spring Boot rulează.",
+      })
     }
   }
+
   return (
     <Card className="w-full max-w-2xl mx-auto bg-zinc-900 border-zinc-800 text-zinc-100 shadow-2xl">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          Profilul tău sportiv
-        </CardTitle>
-
+        <CardTitle className="text-2xl font-bold">Profilul tău sportiv</CardTitle>
         <CardDescription className="text-zinc-400">
           Câmpurile cu * sunt obligatorii.
         </CardDescription>
@@ -259,66 +216,52 @@ export default function ProfileForm() {
 
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-5"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+
+            {/* Banner eroare globală (server / rețea) */}
+            {form.formState.errors.root && (
+              <div className="flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span>{form.formState.errors.root.message}</span>
+              </div>
+            )}
+
+            {/* Ocupație */}
             <FormField
               control={form.control}
               name="occupation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Ocupație
-                  </FormLabel>
-
+                  <FormLabel>Ocupație</FormLabel>
                   <FormControl>
-                    <Input
-                      className={inputCls}
-                      {...field}
-                      value={field.value ?? ""}
-                    />
+                    <Input className={inputCls} {...field} value={field.value ?? ""} />
                   </FormControl>
-
-                  <FormMessage />
+                  <FormMessage className={msgCls} />
                 </FormItem>
               )}
             />
 
+            {/* Obiectiv + Mediu */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="goal"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Obiectiv principal{" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <FormLabel>Obiectiv principal <span className="text-red-400">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className={inputCls}>
                           <SelectValue placeholder="Selectează" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent className={selectCls}>
                         {GOAL_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                          >
-                            {opt.label}
-                          </SelectItem>
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
@@ -328,73 +271,46 @@ export default function ProfileForm() {
                 name="preferredEnvironment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Mediu preferat{" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <FormLabel>Mediu preferat <span className="text-red-400">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className={inputCls}>
                           <SelectValue placeholder="Selectează" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent className={selectCls}>
                         {ENVIRONMENT_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                          >
-                            {opt.label}
-                          </SelectItem>
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Program + Activitate */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="dailySchedule"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Program zilnic{" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <FormLabel>Program zilnic <span className="text-red-400">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className={inputCls}>
                           <SelectValue placeholder="Selectează" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent className={selectCls}>
                         {DAILY_SCHEDULE_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                          >
-                            {opt.label}
-                          </SelectItem>
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
@@ -404,73 +320,46 @@ export default function ProfileForm() {
                 name="activityLevel"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Nivel de activitate{" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <FormLabel>Nivel de activitate <span className="text-red-400">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className={inputCls}>
                           <SelectValue placeholder="Selectează" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent className={selectCls}>
                         {ACTIVITY_LEVEL_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                          >
-                            {opt.label}
-                          </SelectItem>
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Efort + Tip sport */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="effortTolerance"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Toleranță la efort{" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <FormLabel>Toleranță la efort <span className="text-red-400">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className={inputCls}>
                           <SelectValue placeholder="Selectează" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent className={selectCls}>
                         {EFFORT_TOLERANCE_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                          >
-                            {opt.label}
-                          </SelectItem>
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
@@ -480,85 +369,52 @@ export default function ProfileForm() {
                 name="prefersTeam"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Tip sport preferat{" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                    >
+                    <FormLabel>Tip sport preferat <span className="text-red-400">*</span></FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className={inputCls}>
                           <SelectValue placeholder="Selectează" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent className={selectCls}>
                         {PREFERS_TEAM_OPTIONS.map((opt) => (
-                          <SelectItem
-                            key={opt.value}
-                            value={opt.value}
-                          >
-                            {opt.label}
-                          </SelectItem>
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Ore libere */}
             <FormField
               control={form.control}
               name="freeHoursWeek"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Ore libere / săptămână{" "}
-                    <span className="text-red-400">*</span>
-                  </FormLabel>
-
+                  <FormLabel>Ore libere / săptămână <span className="text-red-400">*</span></FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={168}
-                      className={inputCls}
-                      {...field}
-                    />
+                    <Input type="number" min={0} max={168} className={inputCls} {...field} />
                   </FormControl>
-
-                  <FormMessage />
+                  <FormMessage className={msgCls} />
                 </FormItem>
               )}
             />
 
+            {/* Buget */}
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="budgetMin"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Buget minim (RON){" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
+                    <FormLabel>Buget minim (RON) <span className="text-red-400">*</span></FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        className={inputCls}
-                        {...field}
-                      />
+                      <Input type="number" min={0} className={inputCls} {...field} />
                     </FormControl>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
@@ -568,35 +424,23 @@ export default function ProfileForm() {
                 name="budgetMax"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Buget maxim (RON){" "}
-                      <span className="text-red-400">*</span>
-                    </FormLabel>
-
+                    <FormLabel>Buget maxim (RON) <span className="text-red-400">*</span></FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        className={inputCls}
-                        {...field}
-                      />
+                      <Input type="number" min={0} className={inputCls} {...field} />
                     </FormControl>
-
-                    <FormMessage />
+                    <FormMessage className={msgCls} />
                   </FormItem>
                 )}
               />
             </div>
 
+            {/* Note medicale */}
             <FormField
               control={form.control}
               name="medicalNotes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    Restricții medicale / Note
-                  </FormLabel>
-
+                  <FormLabel>Restricții medicale / Note</FormLabel>
                   <FormControl>
                     <Textarea
                       rows={3}
@@ -605,20 +449,17 @@ export default function ProfileForm() {
                       value={field.value ?? ""}
                     />
                   </FormControl>
-
-                  <FormMessage />
+                  <FormMessage className={msgCls} />
                 </FormItem>
               )}
             />
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-6"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-6 disabled:opacity-60"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting
-                ? "Se salvează..."
-                : "Salvează profilul"}
+              {form.formState.isSubmitting ? "Se salvează..." : "Salvează profilul"}
             </Button>
           </form>
         </Form>

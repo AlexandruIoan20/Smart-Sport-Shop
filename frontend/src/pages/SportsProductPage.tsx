@@ -5,24 +5,24 @@ import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types";
 
 type Sport = {
-  sportId:     string;
-  name:        string;
+  sportId: string;
+  name: string;
   description: string;
   effortLevel: number;
-  minBudget:   number;
-  imageUrl:    string | null;
-  teamSport:   boolean;
-  outdoor:     boolean;
-  active:      boolean;
+  minBudget: number;
+  imageUrl: string | null;
+  teamSport: boolean;
+  outdoor: boolean;
+  active: boolean;
 };
 
 export default function SportProductsPage() {
   const { sportId } = useParams<{ sportId: string }>();
 
-  const [sport,              setSport]              = useState<Sport | null>(null);
+  const [sport, setSport] = useState<Sport | null>(null);
   const [productsByCategory, setProductsByCategory] = useState<Record<string, Product[]>>({});
-  const [loading,            setLoading]            = useState(true);
-  const [error,              setError]              = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!sportId) return;
@@ -47,7 +47,6 @@ export default function SportProductsPage() {
 
       setSport(sportData);
 
-      // Grupam direct dupa categoryName — fara nevoie de categoryId
       const mapped: Record<string, Product[]> = {};
       products.forEach(p => {
         const key = p.categoryName ?? "Altele";

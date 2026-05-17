@@ -5,18 +5,18 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record AdminProductDTO(
-        UUID          productId,
-        String        name,
-        String        description,
+        UUID productId,
+        String name,
+        String description,
         BigDecimal price,
         UUID categoryId,
-        String        categoryName,
-        UUID          sportId,
-        String        sportName,
-        String        targetLevel,
-        String        brand,
-        String        imageUrl,
-        Boolean       isActive,
+        String categoryName,
+        UUID sportId,
+        String sportName,
+        String targetLevel,
+        String brand,
+        String imageUrl,
+        Boolean isActive,
         LocalDateTime createdAt,
-        Integer       stockQty
+        Integer stockQty
 ) {}

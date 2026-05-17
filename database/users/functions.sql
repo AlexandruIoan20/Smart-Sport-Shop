@@ -1,10 +1,10 @@
 CREATE OR REPLACE FUNCTION register_user(
-    p_username      VARCHAR,
-    p_email         VARCHAR,
+    p_username VARCHAR,
+    p_email VARCHAR,
     p_password_hash VARCHAR,
-    p_first_name    VARCHAR,
-    p_last_name     VARCHAR,
-    p_birth_date    DATE
+    p_first_name VARCHAR,
+    p_last_name VARCHAR,
+    p_birth_date DATE
 ) RETURNS UUID AS $$
 DECLARE
     v_new_user_id UUID;
@@ -30,7 +30,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_user_for_login(p_email VARCHAR)
 RETURNS TABLE (
-    id            UUID,
+    id UUID,
     password_hash VARCHAR
 ) AS $$
 BEGIN
@@ -42,18 +42,18 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_user_profile(p_user_id UUID)
 RETURNS TABLE (
-    occupation            VARCHAR,
-    goal                  goal_type,
+    occupation VARCHAR,
+    goal goal_type,
     preferred_environment environment_type,
-    daily_schedule        daily_schedule_type,
-    free_hours_week       INT,
-    activity_level        activity_level_type,
-    effort_tolerance      effort_tolerance_type,
-    prefers_team          BOOLEAN,
-    medical_notes         TEXT,
-    budget_min            NUMERIC,
-    budget_max            NUMERIC,
-    updated_at            TIMESTAMP
+    daily_schedule daily_schedule_type,
+    free_hours_week INT,
+    activity_level activity_level_type,
+    effort_tolerance effort_tolerance_type,
+    prefers_team BOOLEAN,
+    medical_notes TEXT,
+    budget_min NUMERIC,
+    budget_max NUMERIC,
+    updated_at TIMESTAMP
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -78,18 +78,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION complete_user_profile(
-    p_user_id               UUID,
-    p_occupation            VARCHAR,
-    p_goal                  goal_type,
+    p_user_id UUID,
+    p_occupation VARCHAR,
+    p_goal goal_type,
     p_preferred_environment environment_type,
-    p_daily_schedule        daily_schedule_type,
-    p_free_hours_week       INT,
-    p_activity_level        activity_level_type,
-    p_effort_tolerance      effort_tolerance_type,
-    p_prefers_team          BOOLEAN,
-    p_medical_notes         TEXT,
-    p_budget_min            NUMERIC,
-    p_budget_max            NUMERIC
+    p_daily_schedule daily_schedule_type,
+    p_free_hours_week INT,
+    p_activity_level activity_level_type,
+    p_effort_tolerance effort_tolerance_type,
+    p_prefers_team BOOLEAN,
+    p_medical_notes TEXT,
+    p_budget_min NUMERIC,
+    p_budget_max NUMERIC
 ) RETURNS UUID AS $$
 DECLARE
     v_profile_id UUID;
@@ -158,11 +158,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION update_user_personal_data(
-    p_user_id    UUID,
+    p_user_id UUID,
     p_first_name VARCHAR,
-    p_last_name  VARCHAR,
-    p_phone      VARCHAR,
-    p_address    TEXT
+    p_last_name VARCHAR,
+    p_phone VARCHAR,
+    p_address TEXT
 )
 RETURNS BOOLEAN
 LANGUAGE plpgsql
@@ -171,8 +171,8 @@ BEGIN
     UPDATE users
     SET    first_name = p_first_name,
            last_name  = p_last_name,
-           phone      = p_phone,
-           address    = p_address
+           phone = p_phone,
+           address = p_address
     WHERE  id = p_user_id;
 
     IF NOT FOUND THEN

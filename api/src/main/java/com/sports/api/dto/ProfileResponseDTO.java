@@ -1,7 +1,5 @@
 package com.sports.api.dto;
 
-import java.math.BigDecimal;
-
 public record ProfileResponseDTO(
     String occupation,
     String goal,

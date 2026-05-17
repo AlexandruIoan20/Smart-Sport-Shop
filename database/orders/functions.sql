@@ -53,7 +53,7 @@ CREATE OR REPLACE FUNCTION add_item_to_order(
 DECLARE
     v_order_id UUID;
     v_product_price NUMERIC(10, 2);
-    v_stock_qty INT;
+    v_stock_quantity INT;
 BEGIN
     SELECT id INTO v_order_id FROM orders WHERE user_id = p_user_id AND status = 'PENDING';
 
@@ -66,8 +66,8 @@ BEGIN
         RAISE EXCEPTION 'PRODUCT_NOT_FOUND_OR_INACTIVE' USING ERRCODE = 'P0304';
     END IF;
 
-    SELECT quantity INTO v_stock_qty FROM stock WHERE product_id = p_product_id FOR UPDATE;
-    IF v_stock_qty < 1 THEN
+    SELECT quantity INTO v_stock_quantity FROM stock WHERE product_id = p_product_id FOR UPDATE;
+    IF v_stock_quantity < 1 THEN
         RAISE EXCEPTION 'INSUFFICIENT_STOCK' USING ERRCODE = 'P0306';
     END IF;
 
@@ -89,7 +89,7 @@ CREATE OR REPLACE FUNCTION remove_item_from_order(
 ) RETURNS BOOLEAN AS $$
 DECLARE
     v_order_status order_status_type;
-    v_current_qty INT;
+    v_current_ INT;
     v_unit_price NUMERIC(10, 2);
 BEGIN
     SELECT status INTO v_order_status FROM orders WHERE id = p_order_id;
@@ -99,7 +99,7 @@ BEGIN
 
     PERFORM 1 FROM stock WHERE product_id = p_product_id FOR UPDATE;
 
-    SELECT quantity, unit_price INTO v_current_qty, v_unit_price
+    SELECT quantity, unit_price INTO v_current_, v_unit_price
     FROM order_items WHERE order_id = p_order_id AND product_id = p_product_id FOR UPDATE;
 
     IF NOT FOUND THEN
@@ -108,8 +108,8 @@ BEGIN
 
     DELETE FROM order_items WHERE order_id = p_order_id AND product_id = p_product_id;
 
-    UPDATE stock SET quantity = quantity + v_current_qty, last_updated = now() WHERE product_id = p_product_id;
-    UPDATE orders SET total_amount = total_amount - (v_unit_price * v_current_qty), updated_at = now() WHERE id = p_order_id;
+    UPDATE stock SET quantity = quantity + v_current_, last_updated = now() WHERE product_id = p_product_id;
+    UPDATE orders SET total_amount = total_amount - (v_unit_price * v_current_), updated_at = now() WHERE id = p_order_id;
 
     RETURN TRUE;
 END;
@@ -122,9 +122,9 @@ CREATE OR REPLACE FUNCTION update_item_quantity_in_order(
 ) RETURNS BOOLEAN AS $$
 DECLARE
     v_order_status order_status_type;
-    v_current_qty INT;
+    v_current_ INT;
     v_unit_price NUMERIC(10, 2);
-    v_stock_qty INT;
+    v_stock_quantity INT;
     v_diff INT;
 BEGIN
     IF p_new_quantity <= 0 THEN
@@ -136,19 +136,19 @@ BEGIN
         RAISE EXCEPTION 'ORDER_NOT_PENDING' USING ERRCODE = 'P0502'; 
     END IF;
 
-    SELECT quantity INTO v_stock_qty FROM stock WHERE product_id = p_product_id FOR UPDATE;
+    SELECT quantity INTO v_stock_quantity FROM stock WHERE product_id = p_product_id FOR UPDATE;
 
-    SELECT quantity, unit_price INTO v_current_qty, v_unit_price
+    SELECT quantity, unit_price INTO v_current_, v_unit_price
     FROM order_items WHERE order_id = p_order_id AND product_id = p_product_id FOR UPDATE;
 
     IF NOT FOUND THEN
         RAISE EXCEPTION 'PRODUCT_NOT_IN_ORDER' USING ERRCODE = 'P0503';
     END IF;
 
-    v_diff := p_new_quantity - v_current_qty;
+    v_diff := p_new_quantity - v_current_;
 
     IF v_diff > 0 THEN
-        IF v_stock_qty < v_diff THEN
+        IF v_stock_quantity < v_diff THEN
             RAISE EXCEPTION 'INSUFFICIENT_STOCK' USING ERRCODE = 'P0306';
         END IF;
         UPDATE stock SET quantity = quantity - v_diff, last_updated = now() WHERE product_id = p_product_id;

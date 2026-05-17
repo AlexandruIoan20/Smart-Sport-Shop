@@ -19,7 +19,6 @@ public class AuthService {
         this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
     }
 
-    // --- REGISTER ---
     public UUID register(RegisterRequestDTO request) {
         String hashedPassword = bCryptPasswordEncoder.encode(request.password());
 

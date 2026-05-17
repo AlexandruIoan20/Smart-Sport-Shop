@@ -31,8 +31,8 @@ public class RecommendationsRepository {
         String sql = "SELECT * FROM get_recommendations_by_session(?::uuid)";
 
         return jdbcTemplate.query(sql, rs -> {
-            FullRecommendationDTO result        = null;
-            List<RecommendedSportDTO> sports   = new ArrayList<>();
+            FullRecommendationDTO result = null;
+            List<RecommendedSportDTO> sports = new ArrayList<>();
             List<RecommendedProductDTO> products = new ArrayList<>();
 
             Set<UUID> seenSports   = new HashSet<>();

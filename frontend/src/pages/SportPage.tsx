@@ -45,7 +45,6 @@ export default function SportPage() {
         Toate Sporturile
       </h1>
 
-      {/* GRID RESPONSIVE */}
       <div className="
         grid 
         grid-cols-1 

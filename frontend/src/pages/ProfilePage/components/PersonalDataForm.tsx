@@ -24,8 +24,8 @@ import {
 const formSchema = z.object({
   firstName: z.string().min(1, "Camp obligatoriu"),
   lastName:  z.string().min(1, "Camp obligatoriu"),
-  phone:     z.string().optional(),
-  address:   z.string().optional(),
+  phone: z.string().optional(),
+  address: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -58,8 +58,8 @@ export default function PersonalDataForm() {
           form.reset({
             firstName: data.firstName ?? "",
             lastName:  data.lastName  ?? "",
-            phone:     data.phone     ?? "",
-            address:   data.address   ?? "",
+            phone: data.phone ?? "",
+            address: data.address ?? "",
           })
         }
       } catch (err) {
@@ -78,8 +78,8 @@ export default function PersonalDataForm() {
         body: JSON.stringify({
           firstName: values.firstName,
           lastName:  values.lastName,
-          phone:     values.phone?.trim()   || null,
-          address:   values.address?.trim() || null,
+          phone: values.phone?.trim() || null,
+          address: values.address?.trim() || null,
         }),
       })
 

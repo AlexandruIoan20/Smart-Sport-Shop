@@ -1,5 +1,3 @@
-// src/pages/ProductPage.tsx
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -68,7 +66,6 @@ export default function ProductPage() {
 
       setAddState("success");
 
-      // Resetează la idle după 2 secunde
       setTimeout(() => setAddState("idle"), 2000);
     } catch (err) {
       console.error(err);

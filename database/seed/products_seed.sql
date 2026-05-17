@@ -5,7 +5,6 @@ INSERT INTO categories (id, name, description) VALUES
     ('c1000000-0000-0000-0000-000000000004', 'Accessories', 'Accesorii mici, genți, sticle de apă, ceasuri sport.');
 
 INSERT INTO products (id, name, description, price, category_id, sport_id, target_level, brand, image_url) VALUES
-
     -- RUNNING (a...01)
     ('a1000000-0000-0000-0000-000000000001', 'Kalenji Run Cushion', 'Pantofi de alergare pentru începători, amortizare excelentă.', 120.00, 'c1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'BEGINNER', 'Kalenji', 'https://loremflickr.com/500/500/running,shoes?lock=1'),
     ('a1000000-0000-0000-0000-000000000002', 'Asics Gel-Kayano 30', 'Pantofi pentru distanțe medii și lungi, suport pronat.', 750.00, 'c1000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'INTERMEDIATE', 'Asics', 'https://loremflickr.com/500/500/running,sneakers?lock=2'),

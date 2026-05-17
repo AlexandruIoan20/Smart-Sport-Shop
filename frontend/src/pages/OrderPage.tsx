@@ -1,5 +1,3 @@
-// src/pages/OrderPage.tsx
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -196,7 +194,6 @@ export default function OrderPage() {
   const isOrderCancelled = cart?.orderStatus === "CANCELLED";
   const isOrderEditable = !isOrderConfirmed && !isOrderCancelled;
 
-  // ─── LOADING ──────────────────────────────────────────────────────────────
   if (pageLoading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -208,7 +205,6 @@ export default function OrderPage() {
     );
   }
 
-  // ─── EMPTY ────────────────────────────────────────────────────────────────
   if (!cart || cart.items.length === 0) {
     return (
       <div className="min-h-screen bg-zinc-950 text-white flex flex-col items-center justify-center gap-6 px-6">
@@ -232,7 +228,6 @@ export default function OrderPage() {
     );
   }
 
-  // ─── PAGE ─────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
 

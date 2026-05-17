@@ -70,6 +70,7 @@ export default function Navbar() {
 
   function handleLogout() {
     localStorage.removeItem("userId");
+    localStorage.removeItem("sessionId");
     navigate("/login");
   }
 

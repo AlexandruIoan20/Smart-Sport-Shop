@@ -38,11 +38,11 @@ const STATUS_CONFIG: Record<
   string,
   { label: string; color: string; bg: string; Icon: React.ElementType }
 > = {
-  PENDING:   { label: "În așteptare", color: "text-amber-400",  bg: "bg-amber-400/10",  Icon: Clock        },
-  CONFIRMED: { label: "Confirmată",   color: "text-blue-400",   bg: "bg-blue-400/10",   Icon: CheckCircle2 },
-  SHIPPED:   { label: "Expediată",    color: "text-violet-400", bg: "bg-violet-400/10", Icon: Truck        },
-  DELIVERED: { label: "Livrată",      color: "text-emerald-400",bg: "bg-emerald-400/10",Icon: CheckCircle2 },
-  CANCELLED: { label: "Anulată",      color: "text-red-400",    bg: "bg-red-400/10",    Icon: XCircle      },
+  PENDING: { label: "În așteptare", color: "text-amber-400",  bg: "bg-amber-400/10",  Icon: Clock },
+  CONFIRMED: { label: "Confirmată", color: "text-blue-400",   bg: "bg-blue-400/10",   Icon: CheckCircle2 },
+  SHIPPED: { label: "Expediată", color: "text-violet-400", bg: "bg-violet-400/10", Icon: Truck },
+  DELIVERED: { label: "Livrată", color: "text-emerald-400",bg: "bg-emerald-400/10",Icon: CheckCircle2 },
+  CANCELLED: { label: "Anulată", color: "text-red-400",    bg: "bg-red-400/10",    Icon: XCircle },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -85,14 +85,14 @@ function OrderCard({ order }: { order: Order }) {
         onClick={() => setExpanded((p) => !p)}
       >
         {/* Icon */}
-        <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
           <ShoppingBag className="w-5 h-5 text-zinc-400" />
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-white font-mono text-xs text-zinc-500">
+            <span className="text-white font-mono text-xs">
               #{order.orderId.split("-")[0].toUpperCase()}
             </span>
             <StatusBadge status={order.status} />
@@ -104,7 +104,7 @@ function OrderCard({ order }: { order: Order }) {
         </div>
 
         {/* Total + chevron */}
-        <div className="text-right flex-shrink-0">
+        <div className="text-right shrink-0">
           <div className="text-white font-bold">
             {Number(order.totalAmount).toFixed(2)} RON
           </div>
@@ -131,7 +131,7 @@ function OrderCard({ order }: { order: Order }) {
                 <img
                   src={item.imageUrl ?? "https://placehold.co/80x80"}
                   alt={item.productName}
-                  className="w-12 h-12 rounded-lg object-cover flex-shrink-0 bg-zinc-800"
+                  className="w-12 h-12 rounded-lg object-cover shrink-0 bg-zinc-800"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="text-white text-sm font-medium truncate">
@@ -141,7 +141,7 @@ function OrderCard({ order }: { order: Order }) {
                     x{item.quantity} · {Number(item.unitPrice).toFixed(2)} RON / buc.
                   </div>
                 </div>
-                <div className="text-blue-400 text-sm font-semibold flex-shrink-0">
+                <div className="text-blue-400 text-sm font-semibold shrink-0">
                   {(item.quantity * Number(item.unitPrice)).toFixed(2)} RON
                 </div>
               </div>

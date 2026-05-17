@@ -7,7 +7,6 @@ export default function HistoryDropdown() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close on outside click
   useState(() => {
     function handleClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -44,7 +43,7 @@ export default function HistoryDropdown() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800 transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600/30 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center shrink-0 group-hover:bg-blue-600/30 transition-colors">
                 <ShoppingBag className="w-4 h-4 text-blue-400" />
               </div>
               <div>
@@ -58,12 +57,12 @@ export default function HistoryDropdown() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-800 transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-amber-600/20 flex items-center justify-center flex-shrink-0 group-hover:bg-amber-600/30 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-amber-600/20 flex items-center justify-center shrink-0 group-hover:bg-amber-600/30 transition-colors">
                 <Sparkles className="w-4 h-4 text-amber-400" />
               </div>
               <div>
                 <div className="text-white text-sm font-medium">Istoric recomandări</div>
-                <div className="text-zinc-500 text-xs">Sesiuni anterioare AI</div>
+                <div className="text-zinc-500 text-xs">Sesiuni anterioare</div>
               </div>
             </Link>
           </div>

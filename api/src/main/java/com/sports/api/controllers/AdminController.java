@@ -12,7 +12,6 @@ import java.util.UUID;
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*")
 public class AdminController {
-
     private final AdminService adminService;
 
     public AdminController(AdminService adminService) {

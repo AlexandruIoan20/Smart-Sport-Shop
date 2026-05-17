@@ -6,15 +6,15 @@ import RecommendedSportCard from "./components/RecommendedSportCard"
 const USER_ID = localStorage.getItem("userId") ?? ""
 
 const LEVEL_LABELS: Record<string, string> = {
-  BEGINNER:     "Începător",
+  BEGINNER: "Începător",
   INTERMEDIATE: "Intermediar",
-  ADVANCED:     "Avansat",
+  ADVANCED: "Avansat",
 }
 
 export default function RecommendationsPage() {
-  const [data,    setData]    = useState<FullRecommendation | null>(null)
+  const [data, setData] = useState<FullRecommendation | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     loadRecommendations()

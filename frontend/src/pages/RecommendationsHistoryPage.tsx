@@ -15,8 +15,6 @@ import {
 const USER_ID = localStorage.getItem("userId") ?? "";
 const API = "http://localhost:8081";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
 interface RecommendationSport {
   sportId: string;
   sportName: string;
@@ -48,12 +46,10 @@ interface RecommendationSession {
   products: RecommendationProduct[];
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 const LEVEL_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  BEGINNER:     { label: "Începător",    color: "text-emerald-400", bg: "bg-emerald-400/10" },
-  INTERMEDIATE: { label: "Intermediar", color: "text-amber-400",   bg: "bg-amber-400/10"   },
-  ADVANCED:     { label: "Avansat",     color: "text-red-400",     bg: "bg-red-400/10"     },
+  BEGINNER: { label: "Începător", color: "text-emerald-400", bg: "bg-emerald-400/10" },
+  INTERMEDIATE: { label: "Intermediar", color: "text-amber-400", bg: "bg-amber-400/10" },
+  ADVANCED: { label: "Avansat", color: "text-red-400", bg: "bg-red-400/10" },
 };
 
 function LevelBadge({ level }: { level: string }) {
@@ -103,8 +99,6 @@ function EffortDots({ level }: { level: number }) {
   );
 }
 
-// ─── Session Card ─────────────────────────────────────────────────────────────
-
 function SessionCard({ session }: { session: RecommendationSession }) {
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<"sports" | "products">("sports");
@@ -129,7 +123,7 @@ function SessionCard({ session }: { session: RecommendationSession }) {
         onClick={() => setExpanded((p) => !p)}
       >
         {/* Icon */}
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/20 flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/20 flex items-center justify-center shrink-0">
           <Sparkles className="w-5 h-5 text-amber-400" />
         </div>
 
@@ -152,7 +146,7 @@ function SessionCard({ session }: { session: RecommendationSession }) {
         </div>
 
         {/* Chevron */}
-        <div className="text-zinc-600 flex-shrink-0">
+        <div className="text-zinc-600 shrink-0">
           {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
         </div>
       </button>
@@ -192,7 +186,7 @@ function SessionCard({ session }: { session: RecommendationSession }) {
               {session.sports.map((sport) => (
                 <div key={sport.sportId} className="px-5 py-3.5 flex items-start gap-4">
                   {/* Rank badge */}
-                  <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center flex-shrink-0 text-xs font-bold text-zinc-400 mt-0.5">
+                  <div className="w-7 h-7 rounded-full bg-zinc-800 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-400 mt-0.5">
                     {sport.rank}
                   </div>
 
@@ -201,10 +195,10 @@ function SessionCard({ session }: { session: RecommendationSession }) {
                     <img
                       src={sport.imageUrl}
                       alt={sport.sportName}
-                      className="w-12 h-12 rounded-xl object-cover flex-shrink-0 bg-zinc-800"
+                      className="w-12 h-12 rounded-xl object-cover shrink-0 bg-zinc-800"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
                       <Trophy className="w-6 h-6 text-zinc-600" />
                     </div>
                   )}
@@ -262,7 +256,7 @@ function SessionCard({ session }: { session: RecommendationSession }) {
                     <img
                       src={product.imageUrl ?? "https://placehold.co/80x80"}
                       alt={product.productName}
-                      className="w-12 h-12 rounded-xl object-cover flex-shrink-0 bg-zinc-800"
+                      className="w-12 h-12 rounded-xl object-cover shrink-0 bg-zinc-800"
                     />
 
                     <div className="flex-1 min-w-0">
@@ -279,13 +273,13 @@ function SessionCard({ session }: { session: RecommendationSession }) {
                       </div>
                       {product.reason && (
                         <div className="flex items-start gap-1 mt-1">
-                          <Zap className="w-3 h-3 text-blue-400 flex-shrink-0 mt-0.5" />
+                          <Zap className="w-3 h-3 text-blue-400 shrink-0 mt-0.5" />
                           <span className="text-zinc-400 text-xs">{product.reason}</span>
                         </div>
                       )}
                     </div>
 
-                    <div className="text-blue-400 font-bold text-sm flex-shrink-0">
+                    <div className="text-blue-400 font-bold text-sm shrink-0">
                       {Number(product.price).toFixed(2)} RON
                     </div>
                   </div>
@@ -299,7 +293,7 @@ function SessionCard({ session }: { session: RecommendationSession }) {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+
 
 export default function RecommendationHistoryPage() {
   const [sessions, setSessions] = useState<RecommendationSession[]>([]);
@@ -366,7 +360,7 @@ export default function RecommendationHistoryPage() {
         {/* Empty */}
         {!loading && !error && sessions.length === 0 && (
           <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-12 flex flex-col items-center gap-4 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-amber-500/20 to-orange-600/10 border border-amber-500/20 flex items-center justify-center">
               <Sparkles className="w-8 h-8 text-amber-400" />
             </div>
             <div>

@@ -23,7 +23,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UUID> register(@RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<UUID> register(
+            @RequestBody RegisterRequestDTO request) {
         UUID userId = userService.register(request);
         return ResponseEntity.ok(userId);
     }
@@ -38,7 +39,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/profile")
-    public ResponseEntity<ProfileResponseDTO> getUserProfile(@PathVariable UUID userId) {
+    public ResponseEntity<ProfileResponseDTO> getUserProfile(
+            @PathVariable UUID userId) {
         ProfileResponseDTO profile = userService.getUserProfile(userId);
         if (profile == null) {
             return ResponseEntity.noContent().build();
@@ -47,7 +49,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/personal-data")
-    public ResponseEntity<PersonalDataResponseDTO> getPersonalData(@PathVariable UUID userId) {
+    public ResponseEntity<PersonalDataResponseDTO> getPersonalData(
+            @PathVariable UUID userId) {
         PersonalDataResponseDTO data = userService.getPersonalData(userId);
         if (data == null) {
             return ResponseEntity.notFound().build();

@@ -110,7 +110,7 @@ export default function CartDropdown() {
                 <img
                   src={item.imageUrl ?? "https://placehold.co/100x100"}
                   alt={item.productName}
-                  className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                  className="w-12 h-12 rounded-lg object-cover shrink-0"
                 />
 
                 <div className="flex-1 overflow-hidden">

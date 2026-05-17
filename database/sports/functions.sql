@@ -1,14 +1,14 @@
 CREATE OR REPLACE FUNCTION get_all_sports()
 RETURNS TABLE (
-    sport_id         UUID,
-    name             VARCHAR,
-    description      TEXT,
-    is_team_sport    BOOLEAN,
-    is_outdoor       BOOLEAN,
-    effort_level     INT,
-    min_budget       NUMERIC,
-    image_url        VARCHAR,
-    is_active        BOOLEAN
+    sport_id UUID,
+    name VARCHAR,
+    description TEXT,
+    is_team_sport BOOLEAN,
+    is_outdoor BOOLEAN,
+    effort_level INT,
+    min_budget NUMERIC,
+    image_url VARCHAR,
+    is_active BOOLEAN
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -30,15 +30,15 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_sport_by_id(p_sport_id UUID)
 RETURNS TABLE (
-    sport_id      UUID,
-    name          VARCHAR,
-    description   TEXT,
+    sport_id UUID,
+    name VARCHAR,
+    description TEXT,
     is_team_sport BOOLEAN,
-    is_outdoor    BOOLEAN,
-    effort_level  INT,
-    min_budget    NUMERIC,
-    image_url     VARCHAR,
-    is_active     BOOLEAN
+    is_outdoor BOOLEAN,
+    effort_level INT,
+    min_budget NUMERIC,
+    image_url VARCHAR,
+    is_active BOOLEAN
 ) AS $$
 BEGIN
     RETURN QUERY

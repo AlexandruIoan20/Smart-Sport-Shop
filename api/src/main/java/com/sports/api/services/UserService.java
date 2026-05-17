@@ -27,10 +27,6 @@ public class UserService {
         return userRepository.callRegisterUserFunction(request, hashedPassword);
     }
 
-    public UserLoginDataDTO getUserForLogin(String email) {
-        return userRepository.getUserForLogin(email);
-    }
-
     public UUID completeProfile(UUID userId, ProfileRequestDTO dto) {
         return userRepository.completeProfile(userId, dto);
     }

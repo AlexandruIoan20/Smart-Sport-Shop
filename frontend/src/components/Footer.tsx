@@ -41,10 +41,6 @@ export default function Footer() {
               <Link to="/profile" className="hover:text-white">
                 Profil
               </Link>
-
-              <Link to="/login" className="hover:text-white">
-                Login
-              </Link>
             </div>
           </div>
         </div>

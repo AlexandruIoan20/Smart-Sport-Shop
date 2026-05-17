@@ -4,17 +4,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 @SpringBootApplication
 public class ApiApplication {
 	private final JdbcTemplate jdbcTemplate;
-	private final Environment   environment;
 
-	public ApiApplication(JdbcTemplate jdbcTemplate, Environment environment) {
+	public ApiApplication(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
-		this.environment   = environment;
 	}
 
 	public static void main(String[] args) {
@@ -24,11 +21,6 @@ public class ApiApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void testDatabaseConnection() {
 		System.out.println("─────────────────────────────────────────");
-		System.out.println("📋 Configurație datasource:");
-		System.out.println("   URL:  " + environment.getProperty("spring.datasource.url"));
-		System.out.println("   User: " + environment.getProperty("spring.datasource.username"));
-		System.out.println("─────────────────────────────────────────");
-
 		try {
 			jdbcTemplate.queryForObject("SELECT 1", Integer.class);
 			System.out.println("✅ Conexiune la baza de date: OK");

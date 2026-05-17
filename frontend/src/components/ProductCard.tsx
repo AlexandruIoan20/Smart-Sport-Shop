@@ -1,5 +1,3 @@
-// src/components/ProductCard.tsx
-
 import type { Product } from "@/types";
 
 import { Card, CardContent } from "@/components/ui/card";

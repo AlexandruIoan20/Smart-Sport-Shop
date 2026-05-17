@@ -25,7 +25,6 @@ public class ProfileController {
         ProfileResponseDTO profile = profileService.getUserProfile(userId);
 
         return ResponseEntity.ok(Objects.requireNonNullElseGet(profile, () -> Map.of("exists", false)));
-
     }
 
     @PostMapping("/complete")

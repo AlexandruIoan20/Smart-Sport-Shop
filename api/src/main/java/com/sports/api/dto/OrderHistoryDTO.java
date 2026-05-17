@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.UUID;
 
 public record OrderHistoryDTO(
-        UUID orderId,
-        String status,
-        BigDecimal totalAmount,
-        String shippingAddress,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        UUID sessionId,
-        long itemCount,
-        List<OrderItemDTO> items
+    UUID orderId,
+    String status,
+    BigDecimal totalAmount,
+    String shippingAddress,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    UUID sessionId,
+    long itemCount,
+    List<OrderItemDTO> items
 ) {}
